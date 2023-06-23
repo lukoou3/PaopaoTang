@@ -133,6 +133,11 @@ void Game::init(){
     for (int i = 0; i < 3; i++) {
         getimage(&PoPoItem::imgs[i], 43 * i, 0 , 43, 45);
     }
+    loadimage(&img, "res/GiftRun1.png");
+    SetWorkingImage(&img);
+    for (int i = 0; i < 3; i++) {
+        getimage(&RunItem::imgs[i], 43 * i, 0 , 43, 46);
+    }
     SetWorkingImage();
     // 加载图片
     loadimage(&block_red_img, "res/TownBlockRed.bmp", item_width, item_height, true);
@@ -205,11 +210,11 @@ bool can_walking(Game *game, Role &role){
 }
 
 void bomb_callback(Game *game, int row, int col) {
-    if(rand() % 3 != 0) {
+    if(rand() % 5 > 3) {
         return;
     }
 
-    int i = rand() % 2;
+    int i = rand() % 3;
     VirItem * virItem = NULL;
     switch (i) {
         case 0:
@@ -217,6 +222,9 @@ void bomb_callback(Game *game, int row, int col) {
             break;
         case 1:
             virItem = new PoPoItem(col * item_width - (PoPoItem::imgs[0].getwidth() - item_width) / 2,item_height * row- (PoPoItem::imgs[0].getheight() - item_height) / 2 ,row, col);
+            break;
+        case 2:
+            virItem = new RunItem(col * item_width - (RunItem::imgs[0].getwidth() - item_width) / 2,item_height * row- (RunItem::imgs[0].getheight() - item_height) / 2 ,row, col);
             break;
         default:
             break;
@@ -285,15 +293,20 @@ void Game::show(){
                     break;
             }
         }
+        if(i == role.Row()){
+            role.Show();
+        }
+        virItemManager.Show(i, roles);
     }
 
-    virItemManager.Show(roles);
+
 
     bubbleManager.Show();
     bubbleManager.Bomb(game_map, roles, bomb_callback);
 
+    //role.Show();
     role.WalkIng(game_map, can_walking);
-    role.Show();
+
     bubbleManager.ExplodeShow();
 
     putimagePNG(windmill_x - item_width, windmill_y - 3 * item_height + 2, n % 24 <= 11? &windmill_ani_img1: &windmill_ani_img2);

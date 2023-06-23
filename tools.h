@@ -6,6 +6,7 @@ int getDelay();
 
 void putimagePNG(int  picture_x, int picture_y, IMAGE* picture);
 
+void putimagePNGXY(int x, int y, int winWidth, int winHeight, IMAGE* picture);
 void putimagePNGY(int x, int y, int winHeight, IMAGE* picture);
 // 适用于 y <0 以及y>0的任何情况
 void putimagePNG2(int x, int y, IMAGE* picture);

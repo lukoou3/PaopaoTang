@@ -14,7 +14,7 @@ public:
     virtual ~VirItem(){
         cout << "~VirItem:" << "row:" << row << "col:" << col << endl;
     }
-    virtual void Show() = 0;
+    virtual void Show(int winWidth, int winHeight) = 0;
     virtual void Effect(Role *role) = 0;
 };
 
@@ -27,7 +27,7 @@ public:
     ~PowerItem(){
         cout << "~PowerItem:" << "row:" << row << "col:" << col << endl;
     }
-    void Show();
+    void Show(int winWidth, int winHeight);
     void Effect(Role *role);
 };
 
@@ -40,16 +40,32 @@ public:
     ~PoPoItem(){
         cout << "~PoPoItem:" << "row:" << row << "col:" << col << endl;
     }
-    void Show();
+    void Show(int winWidth, int winHeight);
+    void Effect(Role *role);
+};
+
+class RunItem: public VirItem {
+public:
+    const static int img_len = 3;
+    static IMAGE imgs[img_len];
+public:
+    RunItem(int x, int y, int row, int col);
+    ~RunItem(){
+        cout << "~RunItem:" << "row:" << row << "col:" << col << endl;
+    }
+    void Show(int winWidth, int winHeight);
     void Effect(Role *role);
 };
 
 class VirItemManager {
+    int win_width, win_height;
     list<VirItem*> virItems;
     int count = 0;
 public:
+    Game *game;
+    VirItemManager(Game *game, int win_width, int win_height);
     void Add(VirItem* virItem);
-    void Show(vector<Role*> &roles);
+    void Show(int row, vector<Role*> &roles);
     void Clear();
 };
 

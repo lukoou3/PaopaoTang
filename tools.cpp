@@ -56,6 +56,46 @@ void putimagePNG(int  picture_x, int picture_y, IMAGE* picture) //x为载入图�
     }
 }
 
+void putimagePNGXY(int x, int y, int winWidth, int winHeight, IMAGE* picture) {
+    if(x <= -picture->getwidth() || x >= winWidth){
+        return;
+    }
+
+    if(y <= -picture->getheight() || y >= winHeight){
+        return;
+    }
+
+    IMAGE imgTmp;
+    if (y < 0) {
+        SetWorkingImage(picture);
+        getimage(&imgTmp, 0, -y,
+                 picture->getwidth(), picture->getheight() + y);
+        SetWorkingImage();
+        y = 0;
+        picture = &imgTmp;
+    }else if (y > winHeight -picture->getheight()) {
+        SetWorkingImage(picture);
+        getimage(&imgTmp, 0, 0, picture->getwidth(), (winHeight -y) );
+        SetWorkingImage();
+        picture = &imgTmp;
+    }
+
+    if (x < 0) {
+        SetWorkingImage(picture);
+        getimage(&imgTmp, -x, 0, picture->getwidth() + x, picture->getheight());
+        SetWorkingImage();
+        x = 0;
+        picture = &imgTmp;
+    }else if (x > winWidth-picture->getwidth()) {
+        SetWorkingImage(picture);
+        getimage(&imgTmp, 0, 0, winWidth - x, picture->getheight());
+        SetWorkingImage();
+        picture = &imgTmp;
+    }
+
+    putimagePNG(x, y, picture);
+}
+
 // 适用于 y <0 以及x<0的任何情况
 void putimagePNGY(int x, int y, int winHeight, IMAGE* picture) {
     IMAGE imgTmp;
@@ -75,8 +115,6 @@ void putimagePNGY(int x, int y, int winHeight, IMAGE* picture) {
         SetWorkingImage();
         picture = &imgTmp;
     }
-
-    putimagePNG(x, y, picture);
 
     putimagePNG(x, y, picture);
 }

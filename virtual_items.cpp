@@ -12,10 +12,10 @@ IMAGE PowerItem::imgs[PowerItem::img_len];
 
 PowerItem::PowerItem(int x, int y, int row, int col): VirItem(x, y, row, col){}
 
-void PowerItem::Show() {
+void PowerItem::Show(int winWidth, int winHeight) {
     n++;
     int i = n / 12;
-    putimagePNG2(x, y , &imgs[i % img_len]);
+    putimagePNGXY(x, y, winWidth, winHeight, &imgs[i % img_len]);
 }
 
 void PowerItem::Effect(Role *role) {
@@ -28,16 +28,40 @@ IMAGE PoPoItem::imgs[PoPoItem::img_len];
 
 PoPoItem::PoPoItem(int x, int y, int row, int col): VirItem(x, y, row, col){}
 
-void PoPoItem::Show() {
+void PoPoItem::Show(int winWidth, int winHeight) {
     n++;
     int i = n / 12;
-    putimagePNG2(x, y , &imgs[i % img_len]);
+    putimagePNGXY(x, y, winWidth, winHeight, &imgs[i % img_len]);
 }
 
 void PoPoItem::Effect(Role *role) {
     if(role->bubbleMax < 5) {
         role->bubbleMax += 1;
     }
+}
+
+IMAGE RunItem::imgs[RunItem::img_len];
+
+RunItem::RunItem(int x, int y, int row, int col): VirItem(x, y, row, col){}
+
+void RunItem::Show(int winWidth, int winHeight) {
+    n++;
+    int i = n / 12;
+    putimagePNGXY(x, y, winWidth, winHeight, &imgs[i % img_len]);
+}
+
+void RunItem::Effect(Role *role) {
+    if(role->speed < item_width / 6) {
+        role->speed += item_width / 20;
+    }
+}
+
+VirItemManager::VirItemManager(Game *game, int win_width, int win_height){
+    this->game = game;
+    this->win_width = win_width;
+    this->win_height = win_height;
+
+    cout << "VirItemManagerInit, game address:" << this->game << endl;
 }
 
 void VirItemManager::Add(VirItem* virItem) {
@@ -57,16 +81,20 @@ bool item_effect_role(VirItem * item, vector<Role*> &roles) {
     return false;
 }
 
-void VirItemManager::Show(vector<Role*> &roles) {
+void VirItemManager::Show(int row, vector<Role*> &roles) {
     for (auto it=virItems.begin(); it!=virItems.end();) {
         VirItem * item = *it;
-        item->Show();
-        if (item_effect_role(item, roles)) {
-            it = virItems.erase(it);
-            count--;
-            cout << "item_effect_role:" << "row:" << item->row << "col:" << item->col << " count:" << count << endl;
-            delete item;
-        } else {
+        if(row == item->row){
+            item->Show(win_width, win_height);
+            if (item_effect_role(item, roles)) {
+                it = virItems.erase(it);
+                count--;
+                cout << "item_effect_role:" << "row:" << item->row << "col:" << item->col << " count:" << count << endl;
+                delete item;
+            } else {
+                it++;
+            }
+        }else {
             it++;
         }
     }

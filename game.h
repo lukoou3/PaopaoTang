@@ -36,7 +36,7 @@ public:
     Role role;
     vector<Role*> roles;
     BubbleManager bubbleManager = BubbleManager(this, win_width, win_height);
-    VirItemManager virItemManager;
+    VirItemManager virItemManager = VirItemManager(this, win_width, win_height);
 
     vector<vector<int>>  game_map = {
             {0, HOUSE1, BLOCK1, HOUSE1, BLOCK1, TREE, 0, TREE, 0, TREE, BLOCK1, HOUSE2, BLOCK1, HOUSE2, 0},

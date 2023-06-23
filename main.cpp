@@ -14,7 +14,7 @@ int main() {
     //loadimage(0, "res/title.png", 0, 0, true);
     loadimage(0, "res/title.png");
     mciSendString("play res/bg.mp3 repeat", 0, 0, 0);
-    system("pause");
+    //system("pause");
     mciSendString("stop res/bg.mp3", 0, 0, 0);
 
     Game *game = new Game();
@@ -24,7 +24,7 @@ int main() {
         loadimage(0, "res/title.png");
         FlushBatchDraw();
         mciSendString("play res/bg.mp3 repeat", 0, 0, 0);
-        system("pause");
+        //system("pause");
         mciSendString("stop res/bg.mp3", 0, 0, 0);
 
         delete game;

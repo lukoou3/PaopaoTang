@@ -32,9 +32,13 @@ void Role::Walk(DIRECTION direction) {
     if(walking){
         return;
     }
-    walking = 5;
-    dir = direction;
-    imgIdx = 0;
+    walking = 1;
+    if(direction == dir){
+
+    }else{
+        dir = direction;
+        imgIdx = 0;
+    }
 }
 
 void Role::WalkIng(vector<vector<int>> &game_map, bool (* fp)(Game *game, Role &role)) {
@@ -43,6 +47,10 @@ void Role::WalkIng(vector<vector<int>> &game_map, bool (* fp)(Game *game, Role &
     }
     walking--;
     imgIdx++;
+    if(imgIdx > 5) {
+        imgIdx = 0;
+    }
+    lastWalk = GetTickCount();
 
     if(! fp(game, * this)) {
         return;
@@ -103,6 +111,9 @@ IMAGE * Role::Img(){
 }
 
 void Role::Show() {
+    if(GetTickCount() - lastWalk >= 300){
+        imgIdx = 0;
+    }
     if(!exploded){
         putimagePNG2(x, y, Img());
     }
@@ -238,6 +249,9 @@ void BubbleManager::Bomb(vector<vector<int>> &game_map, vector<Role*> &roles, vo
             int distance = b.attack_distance;
             int row = b.y / item_width;
             int col = b.x / item_height;
+            if(game_map[row][col] != ROAD){
+                cout << "Bomb_road" << endl;
+            }
             int row_min = max(row - distance, 0) ;
             int row_max = min(row + distance + 1, (int)game_map.size()) ;
             int col_min = max(col - distance, 0) ;
@@ -250,7 +264,7 @@ void BubbleManager::Bomb(vector<vector<int>> &game_map, vector<Role*> &roles, vo
                     // 最后再打破，否则下次刷新画面会打破隔壁的
                     if(bomb_bubble_die(b)){
                         game_map[i][col] = ROAD;
-                        fp(game, b.row, b.col); // 回调函数
+                        fp(game, i, col); // 回调函数
                     }
                     i --;
                     break;
@@ -265,7 +279,7 @@ void BubbleManager::Bomb(vector<vector<int>> &game_map, vector<Role*> &roles, vo
                 if(game_map[i][col] != ROAD){
                     if(bomb_bubble_die(b)) {
                         game_map[i][col] = ROAD;
-                        fp(game, b.row, b.col); // 回调函数
+                        fp(game, i, col); // 回调函数
                     }
                     i ++;
                     break;
@@ -279,7 +293,7 @@ void BubbleManager::Bomb(vector<vector<int>> &game_map, vector<Role*> &roles, vo
                 if(game_map[row][i] != ROAD){
                     if(bomb_bubble_die(b)) {
                         game_map[row][i] = ROAD;
-                        fp(game, b.row, b.col); // 回调函数
+                        fp(game, row, i); // 回调函数
                     }
                     i --;
                     break;
@@ -293,7 +307,7 @@ void BubbleManager::Bomb(vector<vector<int>> &game_map, vector<Role*> &roles, vo
                 if(game_map[row][i] != ROAD){
                     if(bomb_bubble_die(b)) {
                         game_map[row][i] = ROAD;
-                        fp(game, b.row, b.col); // 回调函数
+                        fp(game, row, i); // 回调函数
                     }
                     i ++;
                     break;

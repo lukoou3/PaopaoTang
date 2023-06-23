@@ -25,17 +25,18 @@ class Role {
 private:
     int x, y;
     int win_width, win_height;
-    int speed = item_width / 5;
     DIRECTION dir;
     IMAGE imgs[4][6];
     int imgIdx;
     int walking = 0;
     int row, col;
     int bubble = 0;
+    unsigned long long lastWalk = 0;
     unsigned long long lastBubble = 0;
     int exploded = 0;
     int died = 0;
 public:
+    int speed = item_width / 10;
     int bubbleMax = 2;
     int attack_distance = 1;
     IMAGE ride_imgs1[4];
