@@ -1,6 +1,7 @@
 #ifndef PAOPAOTANG_GAME_H
 #define PAOPAOTANG_GAME_H
 #include "items.h"
+#include "virtual_items.h"
 #include <vector>
 
 using namespace std;

@@ -9,7 +9,7 @@ link_directories(${EasyX_DIR}/lib64) # 如果是32位系统，则使用lib32
 
 link_libraries(libEasyX.a libgdi32.a libole32.a) # 链接EasyX库
 
-add_executable(PaopaoTang main.cpp tools.cpp game.cpp items.cpp)
+add_executable(PaopaoTang main.cpp tools.cpp game.cpp items.cpp virtual_items.cpp)
 add_executable(test test.cpp tools.cpp)
 
 target_link_libraries(PaopaoTang winmm.lib)

@@ -13,7 +13,7 @@ const int item_height = 40;
 
 
 enum ITEM_TYPE {
-    ROAD, BLOCK1, BLOCK2, HOUSE1, HOUSE2, HOUSE3, BOX, TREE, WINDMILL, WINDMILL_VIR
+    ROAD, BLOCK1, BLOCK2, BOX, HOUSE1, HOUSE2, HOUSE3, TREE, WINDMILL, WINDMILL_VIR
 };
 enum DIRECTION {
     UP, DOWN, LEFT, RIGHT
@@ -30,11 +30,12 @@ private:
     int walking = 0;
     int row, col;
     int bubble = 0;
-    int bubbleMax = 5;
     unsigned long long lastBubble = 0;
     int exploded = 0;
     int died = 0;
 public:
+    int bubbleMax = 2;
+    int attack_distance = 1;
     IMAGE ride_imgs1[4];
     IMAGE die_imgs1[11];
 public:
@@ -80,6 +81,7 @@ struct Bubble {
     int y;
     int row;
     int col;
+    int attack_distance;
     int life;
     int stop;
     int imgIdx;
@@ -91,6 +93,7 @@ struct BombBubble {
     int y;
     int row;
     int col;
+    int attack_distance;
     int n; // 第几次显示
     Role *role;
 };
@@ -121,10 +124,13 @@ public:
     void Show();
     void ExplodeShow();
     void ExplodeRole(int row, int col, vector<Role*> &roles);
-    void Bomb(vector<vector<int>> &game_map, vector<Role*> &roles);
+    void Bomb(vector<vector<int>> &game_map, vector<Role*> &roles , void (* fp)(int row, int col));
     void PutBombImg(int  x, int y, IMAGE* picture);
     static void SetPopoImgs(IMAGE _popoImgs[3]);
     static void SetBombImgs(IMAGE bomb_imgs[2][3 + 6 * 2]);
 };
+
+
+
 
 #endif //PAOPAOTANG_ITEMS_H

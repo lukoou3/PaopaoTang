@@ -24,6 +24,7 @@ IMAGE windmill_img;
 Role role;
 vector<Role*> roles;
 BubbleManager bubbleManager(win_width, win_height);
+VirItemManager virItemManager;
 
 vector<vector<int>>  game_map = {
         {0, HOUSE1, BLOCK1, HOUSE1, BLOCK1, TREE, 0, TREE, 0, TREE, BLOCK1, HOUSE2, BLOCK1, HOUSE2, 0},
@@ -139,6 +140,16 @@ void game_init(){
     for (int i = 0; i < 11; i++) {
         getimage(&role_die_imgs1[i], 48 * i, 0 , 48, 100);
     }
+    loadimage(&img, "res/GiftPower.png");
+    SetWorkingImage(&img);
+    for (int i = 0; i < 3; i++) {
+        getimage(&PowerItem::imgs[i], 43 * i, 0 , 43, 45);
+    }
+    loadimage(&img, "res/GiftPoPo.png");
+    SetWorkingImage(&img);
+    for (int i = 0; i < 3; i++) {
+        getimage(&PoPoItem::imgs[i], 43 * i, 0 , 43, 45);
+    }
     SetWorkingImage();
     // 加载图片
     loadimage(&block_red_img, "res/TownBlockRed.bmp", item_width, item_height, true);
@@ -210,6 +221,28 @@ bool can_walking(Role &role){
     return true;
 }
 
+void bomb_callback(int row, int col) {
+    if(rand() % 3 != 0) {
+        return;
+    }
+
+    int i = rand() % 2;
+    VirItem * virItem = NULL;
+    switch (i) {
+        case 0:
+            virItem = new PowerItem(col * item_width - (PowerItem::imgs[0].getwidth() - item_width) / 2,item_height * row- (PowerItem::imgs[0].getheight() - item_height) / 2 ,row, col);
+            break;
+        case 1:
+            virItem = new PoPoItem(col * item_width - (PoPoItem::imgs[0].getwidth() - item_width) / 2,item_height * row- (PoPoItem::imgs[0].getheight() - item_height) / 2 ,row, col);
+            break;
+        default:
+            break;
+    }
+    if(virItem != NULL){
+        virItemManager.Add(virItem);
+    }
+}
+
 void game_show(){
     static int n = 0;
     n++;
@@ -271,8 +304,10 @@ void game_show(){
         }
     }
 
+    virItemManager.Show(roles);
+
     bubbleManager.Show();
-    bubbleManager.Bomb(game_map, roles);
+    bubbleManager.Bomb(game_map, roles, bomb_callback);
 
     role.WalkIng(game_map, can_walking);
     role.Show();

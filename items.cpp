@@ -106,7 +106,7 @@ void Role::Show() {
 
 
 void BubbleManager::AddBubble(int x, int y, Role *role) {
-    bubbles.push_back(Bubble{x, y, role->Row(), role->Col(), 40, 0, 0, role});
+    bubbles.push_back(Bubble{x, y, role->Row(), role->Col(), role->attack_distance, 40, 0, 0, role});
 }
 
 bool bubble_die(Bubble &bubble){
@@ -219,44 +219,76 @@ void BubbleManager::ExplodeRole(int row, int col, vector<Role*> &roles) {
     }
 }
 
-void BubbleManager::Bomb(vector<vector<int>> &game_map, vector<Role*> &roles) {
+void BubbleManager::Bomb(vector<vector<int>> &game_map, vector<Role*> &roles, void (* fp)(int row, int col)) {
     for (auto &b: bombBubbles){
         b.n++;
         if(b.n <= 3){
             PutBombImg(b.x,  b.y, &BubbleManager::bombImgs[0][2]);
             PutBombImg(b.x,  b.y, &BubbleManager::bombImgs[1][2]);
         }else{
+            int distance = b.attack_distance;
             int row = b.y / item_width;
             int col = b.x / item_height;
-            int row_min = max(row - 2, 0) ;
-            int row_max = min(row + 3, (int)game_map.size()) ;
-            int col_min = max(col - 2, 0) ;
-            int col_max = min(col + 3, (int)game_map[0].size()) ;
+            int row_min = max(row - distance, 0) ;
+            int row_max = min(row + distance + 1, (int)game_map.size()) ;
+            int col_min = max(col - distance, 0) ;
+            int col_max = min(col + distance + 1, (int)game_map[0].size()) ;
             int i = row;
-            while (i >= row_min && game_map[i][col] >= ROAD && game_map[i][col] < TREE){
+            while (i >= row_min && game_map[i][col] >= ROAD && game_map[i][col] < HOUSE1){
                 ExplodeRole(i, col, roles);
-                game_map[i][col] = ROAD;
+                // 修改成只能破一个墙
+                if(game_map[i][col] != ROAD){
+                    // 最后再打破，否则下次刷新画面会打破隔壁的
+                    if(bomb_bubble_die(b)){
+                        game_map[i][col] = ROAD;
+                        fp(b.row, b.col); // 回调函数
+                    }
+                    i --;
+                    break;
+                }
                 i --;
             }
             row_min = i + 1;
             i = row;
-            while (i < row_max && game_map[i][col] >= ROAD && game_map[i][col] < TREE){
+            while (i < row_max && game_map[i][col] >= ROAD && game_map[i][col] < HOUSE1){
                 ExplodeRole(i, col, roles);
-                game_map[i][col] = ROAD;
+                // 修改成只能破一个墙
+                if(game_map[i][col] != ROAD){
+                    if(bomb_bubble_die(b)) {
+                        game_map[i][col] = ROAD;
+                        fp(b.row, b.col); // 回调函数
+                    }
+                    i ++;
+                    break;
+                }
                 i ++;
             }
             row_max = i;
             i = col;
-            while (i >= col_min && game_map[row][i] >= ROAD && game_map[row][i] < TREE){
+            while (i >= col_min && game_map[row][i] >= ROAD && game_map[row][i] < HOUSE1){
                 ExplodeRole(row, i, roles);
-                game_map[row][i] = ROAD;
+                if(game_map[row][i] != ROAD){
+                    if(bomb_bubble_die(b)) {
+                        game_map[row][i] = ROAD;
+                        fp(b.row, b.col); // 回调函数
+                    }
+                    i --;
+                    break;
+                }
                 i --;
             }
             col_min = i + 1;
             i = col;
-            while (i < col_max && game_map[row][i] >= ROAD && game_map[row][i] < TREE){
+            while (i < col_max && game_map[row][i] >= ROAD && game_map[row][i] < HOUSE1){
                 ExplodeRole(row, i, roles);
-                game_map[row][i] = ROAD;
+                if(game_map[row][i] != ROAD){
+                    if(bomb_bubble_die(b)) {
+                        game_map[row][i] = ROAD;
+                        fp(b.row, b.col); // 回调函数
+                    }
+                    i ++;
+                    break;
+                }
                 i ++;
             }
             col_max = i;
@@ -312,7 +344,7 @@ void BubbleManager::Show() {
                 b->role->BubbleDie();
                 int x = ( (b->x + popoImgs[b->imgIdx].getwidth()/2) / item_width) * item_width;
                 int y = ( (b->y+ popoImgs[b->imgIdx].getheight()/2) / item_height) * item_height;
-                bombBubbles.push_back(BombBubble{x, y, b->row, b->col, 0, b->role});
+                bombBubbles.push_back(BombBubble{x, y, b->row, b->col, b->attack_distance, 0, b->role});
             }
         }
     }

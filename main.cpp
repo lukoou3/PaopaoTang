@@ -7,6 +7,7 @@ using namespace std;
 
 int main() {
     //Init();
+    srand(timeGetTime());  //用系统时间初始化随机种子
     game_init();
 
     while (1) {
