@@ -1,20 +1,24 @@
 #include "items.h"
 #include <iostream>
+#include "game.h"
 
 using namespace std;
 
-void Role::Init(IMAGE imgs[4][6], int x, int y, int win_width,int win_height){
+void Role::Init(Game *game,IMAGE imgs[4][6], int x, int y, int win_width,int win_height){
     for (int i = 0; i < 4; ++i) {
         for (int j = 0; j < 6; ++j) {
             this->imgs[i][j] = imgs[i][j];
         }
     }
+    this->game = game;
     this->x = x;
     this->y = y;
     this->win_width = win_width;
     this->win_height = win_height;
     dir = DOWN;
     imgIdx = 3;
+
+    cout << "RoleInit, game address:" << this->game << endl;
 
     SetRowCol();
 }
@@ -33,14 +37,14 @@ void Role::Walk(DIRECTION direction) {
     imgIdx = 0;
 }
 
-void Role::WalkIng(vector<vector<int>> &game_map, bool (* fp)(Role &role)) {
+void Role::WalkIng(vector<vector<int>> &game_map, bool (* fp)(Game *game, Role &role)) {
     if(exploded || !walking){
         return;
     }
     walking--;
     imgIdx++;
 
-    if(! fp(* this)) {
+    if(! fp(game, * this)) {
         return;
     }
 
@@ -117,9 +121,12 @@ bool bomb_bubble_die(BombBubble &bombBubble){
     return bombBubble.n > 22;
 }
 
-BubbleManager::BubbleManager(int win_width, int win_height){
+BubbleManager::BubbleManager(Game *game, int win_width, int win_height){
+    this->game = game;
     this->win_width = win_width;
     this->win_height = win_height;
+
+    cout << "BubbleManagerInit, game address:" << this->game << endl;
 }
 IMAGE BubbleManager::popoImgs[3];
 IMAGE BubbleManager::bombImgs[2][3 + 6 * 2];
@@ -178,6 +185,7 @@ void BubbleManager::ExplodeShow() {
                 b.role->Die();
                 b.died = 1;
                 b.n = 0;
+                mciSendString("play res/snd/die.mp3", 0, 0, 0);
             }
         }else if(b.died == 1){
             b.n++;
@@ -198,6 +206,7 @@ void BubbleManager::ExplodeShow() {
                 putimagePNG(b.x , b.y - 40, &b.role->die_imgs1[i]);
             }else{
                 b.died = 2;
+                game -> stop();
             }
         }
 
@@ -219,7 +228,7 @@ void BubbleManager::ExplodeRole(int row, int col, vector<Role*> &roles) {
     }
 }
 
-void BubbleManager::Bomb(vector<vector<int>> &game_map, vector<Role*> &roles, void (* fp)(int row, int col)) {
+void BubbleManager::Bomb(vector<vector<int>> &game_map, vector<Role*> &roles, void (* fp)(Game *game, int row, int col)) {
     for (auto &b: bombBubbles){
         b.n++;
         if(b.n <= 3){
@@ -241,7 +250,7 @@ void BubbleManager::Bomb(vector<vector<int>> &game_map, vector<Role*> &roles, vo
                     // 最后再打破，否则下次刷新画面会打破隔壁的
                     if(bomb_bubble_die(b)){
                         game_map[i][col] = ROAD;
-                        fp(b.row, b.col); // 回调函数
+                        fp(game, b.row, b.col); // 回调函数
                     }
                     i --;
                     break;
@@ -256,7 +265,7 @@ void BubbleManager::Bomb(vector<vector<int>> &game_map, vector<Role*> &roles, vo
                 if(game_map[i][col] != ROAD){
                     if(bomb_bubble_die(b)) {
                         game_map[i][col] = ROAD;
-                        fp(b.row, b.col); // 回调函数
+                        fp(game, b.row, b.col); // 回调函数
                     }
                     i ++;
                     break;
@@ -270,7 +279,7 @@ void BubbleManager::Bomb(vector<vector<int>> &game_map, vector<Role*> &roles, vo
                 if(game_map[row][i] != ROAD){
                     if(bomb_bubble_die(b)) {
                         game_map[row][i] = ROAD;
-                        fp(b.row, b.col); // 回调函数
+                        fp(game, b.row, b.col); // 回调函数
                     }
                     i --;
                     break;
@@ -284,7 +293,7 @@ void BubbleManager::Bomb(vector<vector<int>> &game_map, vector<Role*> &roles, vo
                 if(game_map[row][i] != ROAD){
                     if(bomb_bubble_die(b)) {
                         game_map[row][i] = ROAD;
-                        fp(b.row, b.col); // 回调函数
+                        fp(game, b.row, b.col); // 回调函数
                     }
                     i ++;
                     break;
@@ -341,6 +350,7 @@ void BubbleManager::Show() {
             }
             b->life --;
             if(bubble_die(*b)){
+                mciSendString("play res/snd/explode.mp3", 0, 0, 0);
                 b->role->BubbleDie();
                 int x = ( (b->x + popoImgs[b->imgIdx].getwidth()/2) / item_width) * item_width;
                 int y = ( (b->y+ popoImgs[b->imgIdx].getheight()/2) / item_height) * item_height;

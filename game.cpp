@@ -1,53 +1,36 @@
 #include "game.h"
 #include <iostream>
 
-IMAGE grey_road_img;
-IMAGE green_road_img;
-IMAGE middle_road_img1;
-IMAGE middle_road_img2;
-IMAGE middle_road_img3;
-IMAGE windmill_ani_img1;
-IMAGE windmill_ani_img2;
-IMAGE role_imgs1[4][6];
-IMAGE role_imgs2[4][6];
-IMAGE popo_bomb_imgs[4];
+void Game::run(){
+    cout << "game_run, game address:" << this << endl;
 
-IMAGE block_red_img;
-IMAGE block_yellow_img;
-IMAGE house_blue_img;
-IMAGE house_red_img;
-IMAGE house_yellow_img;
-IMAGE box_img;
-IMAGE tree_img;
-IMAGE windmill_img;
+    init();
+    while (1) {
+        control();
+        show();
 
-Role role;
-vector<Role*> roles;
-BubbleManager bubbleManager(win_width, win_height);
-VirItemManager virItemManager;
+        if(!running){
+            virItemManager.Clear();
+            mciSendString("stop res/snd/bg.mp3", 0, 0, 0);
+            break;
+        }
 
-vector<vector<int>>  game_map = {
-        {0, HOUSE1, BLOCK1, HOUSE1, BLOCK1, TREE, 0, TREE, 0, TREE, BLOCK1, HOUSE2, BLOCK1, HOUSE2, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, BLOCK1, BLOCK2, BLOCK1, BLOCK2, 0, 0},
-        {0, HOUSE1, BLOCK1, HOUSE1, BLOCK1, TREE, BOX, TREE, 0, TREE, BLOCK1, HOUSE2, BLOCK1, HOUSE2, 0},
-        {0, BLOCK1, BLOCK2, BLOCK1, TREE, BOX, BOX, BLOCK1, 0, BOX, TREE, BLOCK1, BLOCK2, BLOCK1, BLOCK2},
-        {0, TREE, BLOCK1, TREE, BOX, BOX, TREE, 0, 0, 0, 0, TREE, BLOCK1, TREE, BLOCK1},
-        {0, 0, BOX, 0, 0, TREE, BLOCK1, 0, 0, TREE, 0, 0, BOX, 0, BLOCK2},
-        {0, TREE, BLOCK1, TREE, 0, BLOCK2, WINDMILL_VIR, WINDMILL, WINDMILL_VIR, BLOCK2, 0, TREE, BLOCK1, TREE, BLOCK2},
-        {0, 0, 0, 0, 0, TREE, BLOCK1, BLOCK1, BLOCK1, TREE, 0, 0, BOX, 0, BLOCK2},
-        {BLOCK1, TREE, BLOCK1, TREE, BOX, BOX, TREE, BLOCK2, TREE, 0, 0, TREE, BLOCK1, TREE, BLOCK1},
-        {BLOCK2, BLOCK1, BLOCK2, BLOCK1, TREE, BOX, BOX, BLOCK1, 0, 0, TREE, BLOCK1, BLOCK2, BLOCK1, BLOCK2},
-        {0, HOUSE2, BLOCK1, HOUSE2, BLOCK1, TREE, BOX, TREE, 0, TREE, BLOCK1, HOUSE3, BLOCK1, HOUSE3, 0},
-        {0, 0, BLOCK2, BLOCK1, BLOCK2, BLOCK1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {0, HOUSE2, BLOCK1, HOUSE2, BLOCK1, TREE, 0, TREE, 0, TREE, BLOCK1, HOUSE3, BLOCK1, HOUSE3, 0},
-};
+        Sleep(30);
+    }
+}
 
-void game_init(){
-    initgraph(win_width, win_height);
+void Game::init(){
+    //preLoadSound("res/snd/start.mp3");
+    //preLoadSound("res/snd/explode.mp3");
+    //preLoadSound("res/snd/get.mp3");
+    //preLoadSound("res/snd/die.mp3");
+
+    mciSendString("play res/snd/start.mp3", 0, 0, 0);
 
     // ffmpeg -i bg.m4a -acodec libmp3lame bd.mp3
     //mciSendString("play res/bg.mp3 repeat", 0, 0, 0);
     mciSendString("play res/snd/bg.mp3 repeat", 0, 0, 0);
+
 
     // 分隔加载图片
     IMAGE img;
@@ -161,7 +144,7 @@ void game_init(){
     loadimage(&tree_img, "res/TownTree.png");
     loadimage(&windmill_img, "res/TownWindmill.png", item_width * 3, 62, true);
 
-    role.Init(role_imgs1, 4 * item_width, 7 * item_height - (64 - 40), win_width, win_height);
+    role.Init(this, role_imgs1, 4 * item_width, 7 * item_height - (64 - 40), win_width, win_height);
     roles.push_back(&role);
     for (int i = 0; i < 4; ++i) {
         role.ride_imgs1[i] = role_ride_imgs1[i];
@@ -173,7 +156,7 @@ void game_init(){
     BeginBatchDraw();
 }
 
-void game_control(){
+void Game::control(){
     if(!role.Exploded()){
         if (GetAsyncKeyState(VK_LEFT) & 0x8000){
             role.Walk(LEFT);
@@ -195,25 +178,25 @@ void game_control(){
     }
 }
 
-bool can_walking(Role &role){
+bool can_walking(Game *game, Role &role){
     int row = role.Row();
     int col = role.Col();
     int x = role.X();
     int y = role.Y();
     if(role.Dir() == UP){
-        if(row > 0  && bubbleManager.HasBubble(row - 1, col) && y <= item_height * row - 20){
+        if(row > 0  && game->bubbleManager.HasBubble(row - 1, col) && y <= item_height * row - 20){
             return false;
         }
     }else if(role.Dir() == DOWN){
-        if(row < game_map.size() - 1 && bubbleManager.HasBubble(row + 1, col) && y >= item_height * row - 20 ){
+        if(row < game->game_map.size() - 1 && game->bubbleManager.HasBubble(row + 1, col) && y >= item_height * row - 20 ){
             return false;
         }
     }else if(role.Dir() == LEFT){
-        if(col > 0 && bubbleManager.HasBubble(row, col-1) && x <= item_width * col - 4){
+        if(col > 0 && game->bubbleManager.HasBubble(row, col-1) && x <= item_width * col - 4){
             return false;
         }
     }else{
-        if(col < game_map[row].size() -1 && bubbleManager.HasBubble(row, col + 1) && x >= item_width * col - 4){
+        if(col < game->game_map[row].size() -1 && game->bubbleManager.HasBubble(row, col + 1) && x >= item_width * col - 4){
             return false;
         }
     }
@@ -221,7 +204,7 @@ bool can_walking(Role &role){
     return true;
 }
 
-void bomb_callback(int row, int col) {
+void bomb_callback(Game *game, int row, int col) {
     if(rand() % 3 != 0) {
         return;
     }
@@ -239,11 +222,11 @@ void bomb_callback(int row, int col) {
             break;
     }
     if(virItem != NULL){
-        virItemManager.Add(virItem);
+        game-> virItemManager.Add(virItem);
     }
 }
 
-void game_show(){
+void Game::show(){
     static int n = 0;
     n++;
     if(n >= 120){
@@ -317,4 +300,8 @@ void game_show(){
 
     FlushBatchDraw();
     //EndBatchDraw();
+}
+
+void Game::stop(){
+    running = false;
 }

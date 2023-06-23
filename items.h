@@ -19,6 +19,8 @@ enum DIRECTION {
     UP, DOWN, LEFT, RIGHT
 };
 
+class Game;
+
 class Role {
 private:
     int x, y;
@@ -39,13 +41,14 @@ public:
     IMAGE ride_imgs1[4];
     IMAGE die_imgs1[11];
 public:
-    void Init(IMAGE imgs[4][6], int x, int y, int win_width, int win_height);
+    Game *game;
+    void Init(Game *game, IMAGE imgs[4][6], int x, int y, int win_width, int win_height);
 
     void SetRowCol();
 
     void Walk(DIRECTION direction);
 
-    void WalkIng(vector<vector<int>> &game_map, bool (* fp)(Role &role));
+    void WalkIng(vector<vector<int>> &game_map, bool (* fp)(Game *game, Role &role));
 
     bool Bubble();
 
@@ -114,7 +117,8 @@ class BubbleManager {
     list<BombBubble> bombBubbles;
     list<ExplodeBubble> explodeBubbles;
 public:
-    BubbleManager(int win_width, int win_height);
+    Game *game;
+    BubbleManager(Game *game, int win_width, int win_height);
     static IMAGE popoImgs[3];
     static IMAGE bombImgs[2][3 + 6 * 2];
     static IMAGE explodeImgs[7];
@@ -124,7 +128,7 @@ public:
     void Show();
     void ExplodeShow();
     void ExplodeRole(int row, int col, vector<Role*> &roles);
-    void Bomb(vector<vector<int>> &game_map, vector<Role*> &roles , void (* fp)(int row, int col));
+    void Bomb(vector<vector<int>> &game_map, vector<Role*> &roles , void (* fp)(Game *game, int row, int col));
     void PutBombImg(int  x, int y, IMAGE* picture);
     static void SetPopoImgs(IMAGE _popoImgs[3]);
     static void SetBombImgs(IMAGE bomb_imgs[2][3 + 6 * 2]);

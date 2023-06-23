@@ -49,6 +49,7 @@ void VirItemManager::Add(VirItem* virItem) {
 bool item_effect_role(VirItem * item, vector<Role*> &roles) {
     for (auto &role: roles){
         if(item->row == role->Row() && item->col == role->Col()){
+            mciSendString("play res/snd/get.mp3", 0, 0, 0);
             item -> Effect(role);
             return true;
         }
