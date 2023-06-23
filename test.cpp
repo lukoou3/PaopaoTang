@@ -1,5 +1,21 @@
-#include "game.h"
 #include <iostream>
+#include <graphics.h>
+#include <vector>
+#include "tools.h"
+
+using namespace std;
+
+const int item_width = 40;
+const int item_height = 40;
+
+enum ITEM_TYPE {
+    ROAD, BLOCK1, BLOCK2, HOUSE1, HOUSE2, HOUSE3, BOX, TREE, WINDMILL, WINDMILL_VIR
+};
+
+const int row = 13;
+const int col = 15;
+const int win_width = item_width * col;
+const int win_height = item_height * row;
 
 IMAGE grey_road_img;
 IMAGE green_road_img;
@@ -10,7 +26,10 @@ IMAGE windmill_ani_img1;
 IMAGE windmill_ani_img2;
 IMAGE role_imgs1[4][6];
 IMAGE role_imgs2[4][6];
+IMAGE role_ride_imgs1[4];
+IMAGE role_die_imgs1[11];
 IMAGE popo_bomb_imgs[4];
+IMAGE popo_big_imgs[9];
 
 IMAGE block_red_img;
 IMAGE block_yellow_img;
@@ -20,10 +39,6 @@ IMAGE house_yellow_img;
 IMAGE box_img;
 IMAGE tree_img;
 IMAGE windmill_img;
-
-Role role;
-vector<Role*> roles;
-BubbleManager bubbleManager(win_width, win_height);
 
 vector<vector<int>>  game_map = {
         {0, HOUSE1, BLOCK1, HOUSE1, BLOCK1, TREE, 0, TREE, 0, TREE, BLOCK1, HOUSE2, BLOCK1, HOUSE2, 0},
@@ -41,12 +56,9 @@ vector<vector<int>>  game_map = {
         {0, HOUSE2, BLOCK1, HOUSE2, BLOCK1, TREE, 0, TREE, 0, TREE, BLOCK1, HOUSE3, BLOCK1, HOUSE3, 0},
 };
 
-void game_init(){
-    initgraph(win_width, win_height);
 
-    // ffmpeg -i bg.m4a -acodec libmp3lame bd.mp3
-    //mciSendString("play res/bg.mp3 repeat", 0, 0, 0);
-    mciSendString("play res/snd/bg.mp3 repeat", 0, 0, 0);
+int main() {
+    initgraph(win_width, win_height);
 
     // 分隔加载图片
     IMAGE img;
@@ -83,7 +95,21 @@ void game_init(){
     for (int i = 0; i < 3; i++) {
         getimage(&popoImgs[i], 44 * i, 0 , 44, 41);
     }
-    BubbleManager::SetPopoImgs(popoImgs);
+    loadimage(&img, "res/BigPopo.png", 72 * 9, 72, true);
+    SetWorkingImage(&img);
+    for (int i = 0; i < 9; i++) {
+        getimage(&popo_big_imgs[i], 72 * i, 0 , 72, 72);
+    }
+    loadimage(&img, "res/Role1Ride.png", 40 * 4, 40 , true);
+    SetWorkingImage(&img);
+    for (int i = 0; i < 4; i++) {
+        getimage(&role_ride_imgs1[i], 40 * i, 0 , 40, 40);
+    }
+    loadimage(&img, "res/Role1Die.png", 48 * 11, 100 , true);
+    SetWorkingImage(&img);
+    for (int i = 0; i < 11; i++) {
+        getimage(&role_die_imgs1[i], 48 * i, 0 , 48, 100);
+    }
     loadimage(&img, "res/Explosion.png", 560, 200, true);
     SetWorkingImage(&img);
     IMAGE bomb_imgs[2][3 + 6 * 2];
@@ -117,29 +143,14 @@ void game_init(){
     getimage(&bomb_imgs[1][12], 40 * 12, 40 * 3 , 40, 40);
     getimage(&bomb_imgs[1][13], 40 * 13, 40 * 2 , 40, 40);
     getimage(&bomb_imgs[1][14], 40 * 13, 40 * 3 , 40, 40);
-    BubbleManager::SetBombImgs(bomb_imgs);
     getimage(&popo_bomb_imgs[0], 0, 40 * 4, 40, 40);
     getimage(&popo_bomb_imgs[1], 40, 40 * 4, 40, 40);
     getimage(&popo_bomb_imgs[2], 40 * 2, 40 * 4, 40, 40);
     getimage(&popo_bomb_imgs[3], 40 * 3, 40 * 4, 40, 40);
-    loadimage(&img, "res/BigPopo.png", 72 * 9, 72, true);
-    SetWorkingImage(&img);
-    for (int i = 0; i < 7; i++) {
-        getimage(&BubbleManager::explodeImgs[i], 72 * (i + 2), 0 , 72, 72);
-    }
-    IMAGE role_ride_imgs1[4];
-    loadimage(&img, "res/Role1Ride.png", 40 * 4, 40 , true);
-    SetWorkingImage(&img);
-    for (int i = 0; i < 4; i++) {
-        getimage(&role_ride_imgs1[i], 40 * i, 0 , 40, 40);
-    }
-    IMAGE role_die_imgs1[11];
-    loadimage(&img, "res/Role1Die.png", 48 * 11, 100 , true);
-    SetWorkingImage(&img);
-    for (int i = 0; i < 11; i++) {
-        getimage(&role_die_imgs1[i], 48 * i, 0 , 48, 100);
-    }
     SetWorkingImage();
+
+
+
     // 加载图片
     loadimage(&block_red_img, "res/TownBlockRed.bmp", item_width, item_height, true);
     loadimage(&block_yellow_img, "res/TownBlockYellow.bmp", item_width, item_height, true);
@@ -150,136 +161,91 @@ void game_init(){
     loadimage(&tree_img, "res/TownTree.png");
     loadimage(&windmill_img, "res/TownWindmill.png", item_width * 3, 62, true);
 
-    role.Init(role_imgs1, 4 * item_width, 7 * item_height - (64 - 40), win_width, win_height);
-    roles.push_back(&role);
-    for (int i = 0; i < 4; ++i) {
-        role.ride_imgs1[i] = role_ride_imgs1[i];
-    }
-    for (int i = 0; i < 11; ++i) {
-        role.die_imgs1[i] = role_die_imgs1[i];
-    }
+    int n = 0;
+    while (1){
+        BeginBatchDraw();
 
-    BeginBatchDraw();
-}
+        for (int i = 0; i < row; i++) {
+            putimagePNG(item_width * 0, item_height * i, &grey_road_img);
+            int j;
+            for (j = 1; j < 6; ++j) {
+                putimagePNG(item_width * j, item_height * i, &green_road_img);
+            }
+            putimagePNG(item_width * j++, item_height * i, &middle_road_img1);
+            putimagePNG(item_width * j++, item_height * i, &middle_road_img2);
+            putimagePNG(item_width * j++, item_height * i, &middle_road_img3);
+            for (; j < col - 1; ++j) {
+                putimagePNG(item_width * j, item_height * i, &green_road_img);
+            }
+            putimagePNG(item_width * j, item_height * i, &grey_road_img);
+        }
 
-void game_control(){
-    if(!role.Exploded()){
-        if (GetAsyncKeyState(VK_LEFT) & 0x8000){
-            role.Walk(LEFT);
-        }
-        if (GetAsyncKeyState(VK_RIGHT) & 0x8000){
-            role.Walk(RIGHT);
-        }
-        if (GetAsyncKeyState(VK_UP) & 0x8000){
-            role.Walk(UP);
-        }
-        if (GetAsyncKeyState(VK_DOWN) & 0x8000){
-            role.Walk(DOWN);
-        }
-        if (GetAsyncKeyState(VK_SPACE) & 0x8000){
-            if(role.Bubble()){
-                bubbleManager.AddBubble(role.X() + role.Img()->getwidth()/2 - 22 , role.Y() + role.Img()->getheight() /2 - 16, &role);
+        int windmill_x = 0, windmill_y= 0;
+
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; ++j) {
+                ITEM_TYPE item_type = (ITEM_TYPE) game_map[i][j];
+                int x = item_width * j, y = item_height * i;
+                switch (item_type) {
+                    case BLOCK1:
+                        putimagePNG(x, y, &block_red_img);
+                        break;
+                    case BLOCK2:
+                        putimagePNG(x, y, &block_yellow_img);
+                        break;
+                    case BOX:
+                        putimagePNG(x, y, &box_img);
+                        break;
+                    case HOUSE1:
+                        putimagePNG2(x, y - 16, &house_red_img);
+                        break;
+                    case HOUSE2:
+                        putimagePNG2(x, y - 16, &house_blue_img);
+                        break;
+                    case HOUSE3:
+                        putimagePNG2(x, y - 16, &house_yellow_img);
+                        break;
+                    case TREE:
+                        putimagePNGY(x, y - (tree_img.getheight() - item_height - 6), win_height, &tree_img);
+                        break;
+                    case WINDMILL:
+                        windmill_x = x;
+                        windmill_y= y;
+                        putimagePNG(windmill_x - item_width, windmill_y, &windmill_img);
+                        break;
+                    default:
+                        break;
+                }
             }
         }
-    }
-}
 
-bool can_walking(Role &role){
-    int row = role.Row();
-    int col = role.Col();
-    int x = role.X();
-    int y = role.Y();
-    if(role.Dir() == UP){
-        if(row > 0  && bubbleManager.HasBubble(row - 1, col) && y <= item_height * row - 20){
-            return false;
+        //putimagePNG(4 * item_width, 7 * item_height - (64 - 40)/2, &role_imgs1[1][0]);
+        if(n < 12){
+            if( n % 3<=1)
+                putimagePNG(4 * item_width - (role_ride_imgs1[1].getwidth()- item_width) / 2, 7 * item_height  - (role_ride_imgs1[1].getheight()- item_height) / 2, &role_ride_imgs1[1]);
+            putimagePNG(4 * item_width - (72- item_width) / 2, 7 * item_height - (72- item_height) / 2, n % 3<=1?&popo_big_imgs[3]:&popo_big_imgs[3]);
+            //putimagePNG(4 * item_width - (72- item_width) / 2, 7 * item_height - (72- item_height) / 2, &popo_big_imgs[7]);
         }
-    }else if(role.Dir() == DOWN){
-        if(row < game_map.size() - 1 && bubbleManager.HasBubble(row + 1, col) && y >= item_height * row - 20 ){
-            return false;
+        if(n == 12)
+            putimagePNG(4 * item_width - (72- item_width) / 2, 7 * item_height - (72- item_height) / 2, &popo_big_imgs[4]);
+        if(n == 13)
+            putimagePNG(4 * item_width - (72- item_width) / 2, 7 * item_height - (72- item_height) / 2, &popo_big_imgs[6]);
+        if(n == 14)
+            putimagePNG(4 * item_width - (72- item_width) / 2, 7 * item_height - (72- item_height) / 2, &popo_big_imgs[7]);
+        if(n == 15)
+            putimagePNG(4 * item_width - (72- item_width) / 2, 7 * item_height - (72- item_height) / 2, &popo_big_imgs[8]);
+        if(n >= 12 && n - 12 < 11){
+            putimagePNG(4 * item_width , n - 12 < 3?6 * item_height: 6 * item_height, &role_die_imgs1[n - 12]);
         }
-    }else if(role.Dir() == LEFT){
-        if(col > 0 && bubbleManager.HasBubble(row, col-1) && x <= item_width * col - 4){
-            return false;
-        }
-    }else{
-        if(col < game_map[row].size() -1 && bubbleManager.HasBubble(row, col + 1) && x >= item_width * col - 4){
-            return false;
-        }
-    }
+        FlushBatchDraw();
 
-    return true;
-}
-
-void game_show(){
-    static int n = 0;
-    n++;
-    if(n >= 120){
-        n = 0;
+        n++;
+        Sleep(200);
     }
 
-    for (int i = 0; i < row; i++) {
-        putimagePNG(item_width * 0, item_height * i, &grey_road_img);
-        int j;
-        for (j = 1; j < 6; ++j) {
-            putimagePNG(item_width * j, item_height * i, &green_road_img);
-        }
-        putimagePNG(item_width * j++, item_height * i, &middle_road_img1);
-        putimagePNG(item_width * j++, item_height * i, &middle_road_img2);
-        putimagePNG(item_width * j++, item_height * i, &middle_road_img3);
-        for (; j < col - 1; ++j) {
-            putimagePNG(item_width * j, item_height * i, &green_road_img);
-        }
-        putimagePNG(item_width * j, item_height * i, &grey_road_img);
-    }
+    EndBatchDraw();
+    Sleep(3000);
 
-    int windmill_x = 0, windmill_y= 0;
-
-    for (int i = 0; i < row; i++) {
-        for (int j = 0; j < col; ++j) {
-            ITEM_TYPE item_type = (ITEM_TYPE) game_map[i][j];
-            int x = item_width * j, y = item_height * i;
-            switch (item_type) {
-                case BLOCK1:
-                    putimagePNG(x, y, &block_red_img);
-                    break;
-                case BLOCK2:
-                    putimagePNG(x, y, &block_yellow_img);
-                    break;
-                case BOX:
-                    putimagePNG(x, y, &box_img);
-                    break;
-                case HOUSE1:
-                    putimagePNG2(x, y - 16, &house_red_img);
-                    break;
-                case HOUSE2:
-                    putimagePNG2(x, y - 16, &house_blue_img);
-                    break;
-                case HOUSE3:
-                    putimagePNG2(x, y - 16, &house_yellow_img);
-                    break;
-                case TREE:
-                    putimagePNGY(x, y - (tree_img.getheight() - item_height - 6), win_height, &tree_img);
-                    break;
-                case WINDMILL:
-                    windmill_x = x;
-                    windmill_y= y;
-                    putimagePNG(windmill_x - item_width, windmill_y, &windmill_img);
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
-    bubbleManager.Show();
-    bubbleManager.Bomb(game_map, roles);
-
-    role.WalkIng(game_map, can_walking);
-    role.Show();
-    bubbleManager.ExplodeShow();
-
-    putimagePNG(windmill_x - item_width, windmill_y - 3 * item_height + 2, n % 24 <= 11? &windmill_ani_img1: &windmill_ani_img2);
-
-    FlushBatchDraw();
-    //EndBatchDraw();
+    system("pause");
+    return 0;
 }

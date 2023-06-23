@@ -34,7 +34,7 @@ void Role::Walk(DIRECTION direction) {
 }
 
 void Role::WalkIng(vector<vector<int>> &game_map, bool (* fp)(Role &role)) {
-    if(!walking){
+    if(exploded || !walking){
         return;
     }
     walking--;
@@ -99,12 +99,14 @@ IMAGE * Role::Img(){
 }
 
 void Role::Show() {
-    putimagePNG2(x, y, Img());
+    if(!exploded){
+        putimagePNG2(x, y, Img());
+    }
 }
 
 
 void BubbleManager::AddBubble(int x, int y, Role *role) {
-    bubbles.push_back(Bubble{x, y, 40, 0, 0, role});
+    bubbles.push_back(Bubble{x, y, role->Row(), role->Col(), 40, 0, 0, role});
 }
 
 bool bubble_die(Bubble &bubble){
@@ -115,17 +117,13 @@ bool bomb_bubble_die(BombBubble &bombBubble){
     return bombBubble.n > 22;
 }
 
-bool explode_bubble_die(ExplodeBubble &bombBubble){
-    return bombBubble.n > 60;
-}
-
 BubbleManager::BubbleManager(int win_width, int win_height){
     this->win_width = win_width;
     this->win_height = win_height;
 }
 IMAGE BubbleManager::popoImgs[3];
 IMAGE BubbleManager::bombImgs[2][3 + 6 * 2];
-IMAGE BubbleManager::explodeImgs[5][2];
+IMAGE BubbleManager::explodeImgs[7];
 
 void BubbleManager::SetPopoImgs(IMAGE _popoImgs[3]) {
     for (int i = 0; i < 3; ++i) {
@@ -160,19 +158,49 @@ void BubbleManager::PutBombImg(int  x, int y, IMAGE* picture){
     putimagePNG(x,  y, picture);
 }
 
+bool explode_bubble_die(ExplodeBubble &bombBubble){
+    return bombBubble.died == 2;
+}
+
 void BubbleManager::ExplodeShow() {
     for (auto &b: explodeBubbles){
-        b.n++;
-        int i = (b.n -1) / 12;
-        if(i < 2){
-            PutBombImg(b.x,  b.y, &explodeImgs[i][0]);
-        }else{
-            PutBombImg(b.x,  b.y, &explodeImgs[i][0]);
-            PutBombImg(b.x,  b.y, &explodeImgs[i][1]);
+        if(b.died == 0){
+            b.n++;
+            int i = (b.n -1) / 12;
+            if(i % 2 == 0){
+                IMAGE *ride_imgs1 = b.role->ride_imgs1;
+                putimagePNG(b.col * item_width - (ride_imgs1[1].getwidth()- item_width) / 2,
+                            b.row * item_height  - (ride_imgs1[1].getheight()- item_height) / 2,
+                            &ride_imgs1[1]);
+            }
+            PutBombImg(b.x,  b.y, i % 2 == 0?&explodeImgs[1]:&explodeImgs[1]);
+            if(b.n > 120){
+                b.role->Die();
+                b.died = 1;
+                b.n = 0;
+            }
+        }else if(b.died == 1){
+            b.n++;
+            int i = (b.n -1) / 12;
+            if(i == 0){
+                putimagePNG(b.x,  b.y, &explodeImgs[2]);
+            }
+            if(i == 1){
+                putimagePNG(b.x,  b.y, &explodeImgs[4]);
+            }
+            if(i == 2){
+                putimagePNG(b.x,  b.y, &explodeImgs[5]);
+            }
+            if(i == 3){
+                putimagePNG(b.x,  b.y, &explodeImgs[6]);
+            }
+            if(i < 11){
+                putimagePNG(b.x , b.y - 40, &b.role->die_imgs1[i]);
+            }else{
+                b.died = 2;
+            }
         }
-        if(explode_bubble_die(b)){
-            b.role->Die();
-        }
+
     }
 
     explodeBubbles.remove_if(explode_bubble_die);
@@ -182,7 +210,11 @@ void BubbleManager::ExplodeRole(int row, int col, vector<Role*> &roles) {
     for (auto &role: roles){
         if(!role -> Exploded() && role -> Row() == row && role -> Col() == col){
             role -> Explode();
-            explodeBubbles.push_back(ExplodeBubble{col * item_width, row * item_height, 0, role});
+            explodeBubbles.push_back(ExplodeBubble{
+                col * item_width - (explodeImgs[1].getwidth()- item_width) / 2,
+                row * item_height- (explodeImgs[1].getheight()- item_height) / 2,
+                row, col ,0, 0, role
+            });
         }
     }
 }
@@ -280,7 +312,7 @@ void BubbleManager::Show() {
                 b->role->BubbleDie();
                 int x = ( (b->x + popoImgs[b->imgIdx].getwidth()/2) / item_width) * item_width;
                 int y = ( (b->y+ popoImgs[b->imgIdx].getheight()/2) / item_height) * item_height;
-                bombBubbles.push_back(BombBubble{x, y, 0, b->role});
+                bombBubbles.push_back(BombBubble{x, y, b->row, b->col, 0, b->role});
             }
         }
     }

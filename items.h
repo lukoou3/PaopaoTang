@@ -35,6 +35,9 @@ private:
     int exploded = 0;
     int died = 0;
 public:
+    IMAGE ride_imgs1[4];
+    IMAGE die_imgs1[11];
+public:
     void Init(IMAGE imgs[4][6], int x, int y, int win_width, int win_height);
 
     void SetRowCol();
@@ -75,6 +78,8 @@ public:
 struct Bubble {
     int x;
     int y;
+    int row;
+    int col;
     int life;
     int stop;
     int imgIdx;
@@ -84,6 +89,8 @@ struct Bubble {
 struct BombBubble {
     int x;
     int y;
+    int row;
+    int col;
     int n; // 第几次显示
     Role *role;
 };
@@ -91,7 +98,10 @@ struct BombBubble {
 struct ExplodeBubble {
     int x;
     int y;
+    int row;
+    int col;
     int n; // 第几次显示
+    int died;
     Role *role;
 };
 
@@ -104,7 +114,7 @@ public:
     BubbleManager(int win_width, int win_height);
     static IMAGE popoImgs[3];
     static IMAGE bombImgs[2][3 + 6 * 2];
-    static IMAGE explodeImgs[5][2];
+    static IMAGE explodeImgs[7];
 public:
     void AddBubble(int x, int y, Role *role);
     bool HasBubble(int row, int col);
