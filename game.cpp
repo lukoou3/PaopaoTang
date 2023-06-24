@@ -187,6 +187,16 @@ void Game::init(){
     for (int i = 0; i < 3; i++) {
         getimage(&RunItem::imgs[i], 43 * i, 0 , 43, 46);
     }
+    loadimage(&img, "res/GiftPrick.png");
+    SetWorkingImage(&img);
+    for (int i = 0; i < 3; i++) {
+        getimage(&PrickItem::imgs[i], 43 * i, 0 , 43, 45);
+    }
+    loadimage(&img, "res/GiftGuard.png");
+    SetWorkingImage(&img);
+    for (int i = 0; i < 3; i++) {
+        getimage(&GuardItem::imgs[i], 43 * i, 0 , 43, 45);
+    }
     SetWorkingImage();
     // 加载图片
     loadimage(&block_red_img, "res/TownBlockRed.bmp", item_width, item_height, true);
@@ -266,11 +276,11 @@ bool can_walking(Game *game, Role &role){
 }
 
 void bomb_callback(Game *game, int row, int col) {
-    if(rand() % 5 > 3) {
+    if(rand() % 5 > 2) {
         return;
     }
 
-    int i = rand() % 3;
+    int i = rand() % 5;
     VirItem * virItem = NULL;
     switch (i) {
         case 0:
@@ -281,6 +291,12 @@ void bomb_callback(Game *game, int row, int col) {
             break;
         case 2:
             virItem = new RunItem(col * item_width - (RunItem::imgs[0].getwidth() - item_width) / 2,item_height * row- (RunItem::imgs[0].getheight() - item_height) / 2 ,row, col);
+            break;
+        case 3:
+            virItem = new PrickItem(col * item_width - (PrickItem::imgs[0].getwidth() - item_width) / 2,item_height * row- (PrickItem::imgs[0].getheight() - item_height) / 2 ,row, col);
+            break;
+        case 4:
+            virItem = new GuardItem(col * item_width - (GuardItem::imgs[0].getwidth() - item_width) / 2,item_height * row- (GuardItem::imgs[0].getheight() - item_height) / 2 ,row, col);
             break;
         default:
             break;

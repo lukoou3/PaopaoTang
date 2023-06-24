@@ -56,6 +56,34 @@ void RunItem::Effect(Role *role) {
     }
 }
 
+IMAGE PrickItem::imgs[PrickItem::img_len];
+
+PrickItem::PrickItem(int x, int y, int row, int col): VirItem(x, y, row, col){}
+
+void PrickItem::Show(int winWidth, int winHeight) {
+    n++;
+    int i = n / 12;
+    putimagePNGXY(x, y, winWidth, winHeight, &imgs[i % img_len]);
+}
+
+void PrickItem::Effect(Role *role) {
+    role->prick_count+=2;
+}
+
+IMAGE GuardItem::imgs[PrickItem::img_len];
+
+GuardItem::GuardItem(int x, int y, int row, int col): VirItem(x, y, row, col){}
+
+void GuardItem::Show(int winWidth, int winHeight) {
+    n++;
+    int i = n / 12;
+    putimagePNGXY(x, y, winWidth, winHeight, &imgs[i % img_len]);
+}
+
+void GuardItem::Effect(Role *role) {
+    role->guard_count+=2;
+}
+
 VirItemManager::VirItemManager(Game *game, int win_width, int win_height){
     this->game = game;
     this->win_width = win_width;

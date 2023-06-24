@@ -57,6 +57,28 @@ public:
     void Effect(Role *role);
 };
 
+class PrickItem: public VirItem {
+public:
+    const static int img_len = 3;
+    static IMAGE imgs[img_len];
+public:
+    PrickItem(int x, int y, int row, int col);
+    ~PrickItem(){ }
+    void Show(int winWidth, int winHeight);
+    void Effect(Role *role);
+};
+
+class GuardItem: public VirItem {
+public:
+    const static int img_len = 3;
+    static IMAGE imgs[img_len];
+public:
+    GuardItem(int x, int y, int row, int col);
+    ~GuardItem(){ }
+    void Show(int winWidth, int winHeight);
+    void Effect(Role *role);
+};
+
 class VirItemManager {
     int win_width, win_height;
     list<VirItem*> virItems;

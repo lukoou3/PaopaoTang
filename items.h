@@ -39,6 +39,8 @@ public:
     int speed = item_width / 10;
     int bubbleMax = 2;
     int attack_distance = 1;
+    int prick_count = 0;
+    int guard_count = 0;
     IMAGE ride_imgs1[4];
     IMAGE die_imgs1[11];
 public:
@@ -54,6 +56,8 @@ public:
     bool Bubble();
 
     void BubbleDie(){bubble--;}
+
+    int AddBubble();
 
     int X() { return x; }
 
@@ -75,6 +79,8 @@ public:
     void Explode() { exploded = 1; }
     void Die() { died = 1; }
 
+    bool Guard();
+
     void Show();
 
     IMAGE *Img();
@@ -86,6 +92,7 @@ struct Bubble {
     int row;
     int col;
     int attack_distance;
+    int type;
     int life;
     int stop;
     int imgIdx;
@@ -98,6 +105,7 @@ struct BombBubble {
     int row;
     int col;
     int attack_distance;
+    int type;
     int n; // 第几次显示
     Role *role;
 };

@@ -1,3 +1,4 @@
+
 #include "items.h"
 #include <iostream>
 #include "game.h"
@@ -106,6 +107,30 @@ bool Role::Bubble() {
     }
 }
 
+int Role::AddBubble() {
+    int type = 0;
+    if(prick_count > 0){
+        prick_count--;
+        type += 1;
+    }
+    return type;
+}
+
+bool Role::Guard() {
+    static unsigned long long lastTs = GetTickCount();
+    auto ts = GetTickCount();
+    if(ts - lastTs <= 2000){
+        return true;
+    }
+    if(guard_count > 0){
+        guard_count--;
+        lastTs = ts;
+        return true;
+    }else{
+        return false;
+    }
+}
+
 IMAGE * Role::Img(){
     return & imgs[dir][imgIdx];
 }
@@ -121,7 +146,7 @@ void Role::Show() {
 
 
 void BubbleManager::AddBubble(int x, int y, Role *role) {
-    bubbles.push_back(Bubble{x, y, role->Row(), role->Col(), role->attack_distance, 40, 0, 0, role});
+    bubbles.push_back(Bubble{x, y, role->Row(), role->Col(), role->attack_distance, role->AddBubble(), 40, 0, 0, role});
 }
 
 bool bubble_die(Bubble &bubble){
@@ -228,7 +253,7 @@ void BubbleManager::ExplodeShow() {
 
 void BubbleManager::ExplodeRole(int row, int col, vector<Role*> &roles) {
     for (auto &role: roles){
-        if(!role -> Exploded() && role -> Row() == row && role -> Col() == col){
+        if(role -> Row() == row && role -> Col() == col && !role->Guard() && !role -> Exploded()){
             role -> Explode();
             explodeBubbles.push_back(ExplodeBubble{
                 col * item_width - (explodeImgs[1].getwidth()- item_width) / 2,
@@ -242,6 +267,7 @@ void BubbleManager::ExplodeRole(int row, int col, vector<Role*> &roles) {
 void BubbleManager::Bomb(vector<vector<int>> &game_map, vector<Role*> &roles, void (* fp)(Game *game, int row, int col)) {
     for (auto &b: bombBubbles){
         b.n++;
+        bool prick = b.type & 1;
         if(b.n <= 3){
             PutBombImg(b.x,  b.y, &BubbleManager::bombImgs[0][2]);
             PutBombImg(b.x,  b.y, &BubbleManager::bombImgs[1][2]);
@@ -266,8 +292,11 @@ void BubbleManager::Bomb(vector<vector<int>> &game_map, vector<Role*> &roles, vo
                         game_map[i][col] = ROAD;
                         fp(game, i, col); // 回调函数
                     }
-                    i --;
-                    break;
+                    // prick可以连续打断
+                    if(!prick){
+                        i --;
+                        break;
+                    }
                 }
                 i --;
             }
@@ -281,8 +310,10 @@ void BubbleManager::Bomb(vector<vector<int>> &game_map, vector<Role*> &roles, vo
                         game_map[i][col] = ROAD;
                         fp(game, i, col); // 回调函数
                     }
-                    i ++;
-                    break;
+                    if(!prick){
+                        i ++;
+                        break;
+                    }
                 }
                 i ++;
             }
@@ -295,8 +326,10 @@ void BubbleManager::Bomb(vector<vector<int>> &game_map, vector<Role*> &roles, vo
                         game_map[row][i] = ROAD;
                         fp(game, row, i); // 回调函数
                     }
-                    i --;
-                    break;
+                    if(!prick){
+                        i --;
+                        break;
+                    }
                 }
                 i --;
             }
@@ -309,8 +342,10 @@ void BubbleManager::Bomb(vector<vector<int>> &game_map, vector<Role*> &roles, vo
                         game_map[row][i] = ROAD;
                         fp(game, row, i); // 回调函数
                     }
-                    i ++;
-                    break;
+                    if(!prick){
+                        i ++;
+                        break;
+                    }
                 }
                 i ++;
             }
@@ -368,7 +403,7 @@ void BubbleManager::Show() {
                 b->role->BubbleDie();
                 int x = ( (b->x + popoImgs[b->imgIdx].getwidth()/2) / item_width) * item_width;
                 int y = ( (b->y+ popoImgs[b->imgIdx].getheight()/2) / item_height) * item_height;
-                bombBubbles.push_back(BombBubble{x, y, b->row, b->col, b->attack_distance, 0, b->role});
+                bombBubbles.push_back(BombBubble{x, y, b->row, b->col, b->attack_distance, b->type, 0, b->role});
             }
         }
     }
