@@ -2,7 +2,7 @@
 #include <Windows.h>
 #include "tools.h"
 
-#include <mmsystem.h>//æ’­æ”¾éŸ³ä¹
+#include <mmsystem.h>//²¥·ÅÒôÀÖ
 #pragma comment(lib, "winmm.lib")
 
 
@@ -20,37 +20,37 @@ int getDelay() {
     }
 }
 
-// è½½å…¥PNGå›¾å¹¶å»é€æ˜éƒ¨åˆ†
-void putimagePNG(int  picture_x, int picture_y, IMAGE* picture) //xä¸ºè½½å…¥å›¾ç‰‡çš„Xåæ ‡ï¼Œyä¸ºYåæ ‡
+// ÔØÈëPNGÍ¼²¢È¥Í¸Ã÷²¿·Ö
+void putimagePNG(int  picture_x, int picture_y, IMAGE* picture) //xÎªÔØÈëÍ¼Æ¬µÄX×ø±ê£¬yÎªY×ø±ê
 {
-    DWORD* dst = GetImageBuffer();    // GetImageBuffer()å‡½æ•°ï¼Œç”¨äºè·å–ç»˜å›¾è®¾å¤‡çš„æ˜¾å­˜æŒ‡é’ˆï¼ŒEASYXè‡ªå¸¦
+    DWORD* dst = GetImageBuffer();    // GetImageBuffer()º¯Êı£¬ÓÃÓÚ»ñÈ¡»æÍ¼Éè±¸µÄÏÔ´æÖ¸Õë£¬EASYX×Ô´ø
     DWORD* draw = GetImageBuffer();
-    DWORD* src = GetImageBuffer(picture); //è·å–pictureçš„æ˜¾å­˜æŒ‡é’ˆ
-    int picture_width = picture->getwidth(); //è·å–pictureçš„å®½åº¦ï¼ŒEASYXè‡ªå¸¦
-    int picture_height = picture->getheight(); //è·å–pictureçš„é«˜åº¦ï¼ŒEASYXè‡ªå¸¦
-    int graphWidth = getwidth();       //è·å–ç»˜å›¾åŒºçš„å®½åº¦ï¼ŒEASYXè‡ªå¸¦
-    int graphHeight = getheight();     //è·å–ç»˜å›¾åŒºçš„é«˜åº¦ï¼ŒEASYXè‡ªå¸¦
-    int dstX = 0;    //åœ¨æ˜¾å­˜é‡Œåƒç´ çš„è§’æ ‡
+    DWORD* src = GetImageBuffer(picture); //»ñÈ¡pictureµÄÏÔ´æÖ¸Õë
+    int picture_width = picture->getwidth(); //»ñÈ¡pictureµÄ¿í¶È£¬EASYX×Ô´ø
+    int picture_height = picture->getheight(); //»ñÈ¡pictureµÄ¸ß¶È£¬EASYX×Ô´ø
+    int graphWidth = getwidth();       //»ñÈ¡»æÍ¼ÇøµÄ¿í¶È£¬EASYX×Ô´ø
+    int graphHeight = getheight();     //»ñÈ¡»æÍ¼ÇøµÄ¸ß¶È£¬EASYX×Ô´ø
+    int dstX = 0;    //ÔÚÏÔ´æÀïÏñËØµÄ½Ç±ê
 
-    // å®ç°é€æ˜è´´å›¾ å…¬å¼ï¼š Cp=Î±p*FP+(1-Î±p)*BP ï¼Œ è´å¶æ–¯å®šç†æ¥è¿›è¡Œç‚¹é¢œè‰²çš„æ¦‚ç‡è®¡ç®—
+    // ÊµÏÖÍ¸Ã÷ÌùÍ¼ ¹«Ê½£º Cp=¦Áp*FP+(1-¦Áp)*BP £¬ ±´Ò¶Ë¹¶¨ÀíÀ´½øĞĞµãÑÕÉ«µÄ¸ÅÂÊ¼ÆËã
     for (int iy = 0; iy < picture_height; iy++)
     {
         for (int ix = 0; ix < picture_width; ix++)
         {
-            int srcX = ix + iy * picture_width; //åœ¨æ˜¾å­˜é‡Œåƒç´ çš„è§’æ ‡
-            int sa = ((src[srcX] & 0xff000000) >> 24); //0xAArrggbb;AAæ˜¯é€æ˜åº¦
-            int sr = ((src[srcX] & 0xff0000) >> 16); //è·å–RGBé‡Œçš„R
+            int srcX = ix + iy * picture_width; //ÔÚÏÔ´æÀïÏñËØµÄ½Ç±ê
+            int sa = ((src[srcX] & 0xff000000) >> 24); //0xAArrggbb;AAÊÇÍ¸Ã÷¶È
+            int sr = ((src[srcX] & 0xff0000) >> 16); //»ñÈ¡RGBÀïµÄR
             int sg = ((src[srcX] & 0xff00) >> 8);   //G
             int sb = src[srcX] & 0xff;              //B
             if (ix >= 0 && ix <= graphWidth && iy >= 0 && iy <= graphHeight && dstX <= graphWidth * graphHeight)
             {
-                dstX = (ix + picture_x) + (iy + picture_y) * graphWidth; //åœ¨æ˜¾å­˜é‡Œåƒç´ çš„è§’æ ‡
+                dstX = (ix + picture_x) + (iy + picture_y) * graphWidth; //ÔÚÏÔ´æÀïÏñËØµÄ½Ç±ê
                 int dr = ((dst[dstX] & 0xff0000) >> 16);
                 int dg = ((dst[dstX] & 0xff00) >> 8);
                 int db = dst[dstX] & 0xff;
-                draw[dstX] = ((sr * sa / 255 + dr * (255 - sa) / 255) << 16)  //å…¬å¼ï¼š Cp=Î±p*FP+(1-Î±p)*BP  ï¼› Î±p=sa/255 , FP=sr , BP=dr
-                             | ((sg * sa / 255 + dg * (255 - sa) / 255) << 8)         //Î±p=sa/255 , FP=sg , BP=dg
-                             | (sb * sa / 255 + db * (255 - sa) / 255);              //Î±p=sa/255 , FP=sb , BP=db
+                draw[dstX] = ((sr * sa / 255 + dr * (255 - sa) / 255) << 16)  //¹«Ê½£º Cp=¦Áp*FP+(1-¦Áp)*BP  £» ¦Áp=sa/255 , FP=sr , BP=dr
+                             | ((sg * sa / 255 + dg * (255 - sa) / 255) << 8)         //¦Áp=sa/255 , FP=sg , BP=dg
+                             | (sb * sa / 255 + db * (255 - sa) / 255);              //¦Áp=sa/255 , FP=sb , BP=db
             }
         }
     }
@@ -96,7 +96,7 @@ void putimagePNGXY(int x, int y, int winWidth, int winHeight, IMAGE* picture) {
     putimagePNG(x, y, picture);
 }
 
-// é€‚ç”¨äº y <0 ä»¥åŠx<0çš„ä»»ä½•æƒ…å†µ
+// ÊÊÓÃÓÚ y <0 ÒÔ¼°x<0µÄÈÎºÎÇé¿ö
 void putimagePNGY(int x, int y, int winHeight, IMAGE* picture) {
     IMAGE imgTmp;
     if (y < 0) {
@@ -119,7 +119,7 @@ void putimagePNGY(int x, int y, int winHeight, IMAGE* picture) {
     putimagePNG(x, y, picture);
 }
 
-// é€‚ç”¨äº y <0 ä»¥åŠx<0çš„ä»»ä½•æƒ…å†µ
+// ÊÊÓÃÓÚ y <0 ÒÔ¼°x<0µÄÈÎºÎÇé¿ö
 void putimagePNG2(int x, int y, IMAGE* picture) {
     IMAGE imgTmp;
     if (y < 0) {
@@ -142,7 +142,7 @@ void putimagePNG2(int x, int y, IMAGE* picture) {
     putimagePNG(x, y, picture);
 }
 
-// é€‚ç”¨äº y <0 ä»¥åŠy>0çš„ä»»ä½•æƒ…å†µ
+// ÊÊÓÃÓÚ y <0 ÒÔ¼°y>0µÄÈÎºÎÇé¿ö
 void putimagePNG2(int x, int y, int winWidth, IMAGE* picture) {
     IMAGE imgTmp;
     if (y < 0) {
@@ -174,7 +174,7 @@ void putimagePNG2(int x, int y, int winWidth, IMAGE* picture) {
     putimagePNG(x, y, picture);
 }
 
-//è®¾A[x01,y01,x02,y02]  B[x11,y11,x12,y12].
+//ÉèA[x01,y01,x02,y02]  B[x11,y11,x12,y12].
 bool rectIntersect(int x01, int y01, int x02, int y02,
                    int x11, int y11, int x12, int y12)
 {

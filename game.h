@@ -12,6 +12,7 @@ const int win_height = item_height * row;
 
 class Game{
     bool running = true;
+    bool win = false;
 public:
     IMAGE grey_road_img;
     IMAGE green_road_img;

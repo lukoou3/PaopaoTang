@@ -46,6 +46,7 @@ void Game::run(){
     cout << "game_run, game address:" << this << endl;
 
     init();
+    cleardevice();
     while (1) {
         control();
         show();
@@ -56,7 +57,12 @@ void Game::run(){
             break;
         }
 
-        Sleep(30);
+        if(win){
+            running = false;
+            mciSendString("play res/snd/win.mp3", 0, 0, 0);
+        }
+
+        Sleep(34);
     }
 }
 
@@ -74,7 +80,7 @@ void Game::init(){
     mciSendString("play res/snd/bg.mp3 repeat", 0, 0, 0);
 
 
-    // åˆ†éš”åŠ è½½å›¾ç‰‡
+    // ·Ö¸ô¼ÓÔØÍ¼Æ¬
     IMAGE img;
     loadimage(&img, "res/road.png");
     SetWorkingImage(&img);
@@ -198,7 +204,7 @@ void Game::init(){
         getimage(&GuardItem::imgs[i], 43 * i, 0 , 43, 45);
     }
     SetWorkingImage();
-    // åŠ è½½å›¾ç‰‡
+    // ¼ÓÔØÍ¼Æ¬
     loadimage(&block_red_img, "res/TownBlockRed.bmp", item_width, item_height, true);
     loadimage(&block_yellow_img, "res/TownBlockYellow.bmp", item_width, item_height, true);
     loadimage(&house_blue_img, "res/TownHouseBlue.png", item_width, item_height + 16, true);
@@ -313,6 +319,8 @@ void Game::show(){
         n = 0;
     }
 
+    clearrectangle(win_width + 10, 0, win_width + 100, win_height);
+
     for (int i = 0; i < row; i++) {
         if(map_type == 1){
             putimagePNG(item_width * 0, item_height * i, &grey_road_img);
@@ -337,11 +345,15 @@ void Game::show(){
     }
 
     int windmill_x = 0, windmill_y= 0;
+    int item_size = 0;
 
     for (int i = 0; i < row; i++) {
         for (int j = 0; j < col; ++j) {
             ITEM_TYPE item_type = (ITEM_TYPE) game_map[i][j];
             int x = item_width * j, y = item_height * i;
+            if(item_type > ROAD && item_type < HOUSE1){
+                item_size++;
+            }
             switch (item_type) {
                 case BLOCK1:
                     putimagePNG(x, y, &block_red_img);
@@ -381,8 +393,15 @@ void Game::show(){
         }
         virItemManager.Show(i, roles);
     }
-
-
+    settextstyle(16, 0,  _T("ËÎÌå"));
+    setcolor(WHITE);
+    TCHAR text[62];
+    setcolor(WHITE);
+    _stprintf(text,  _T("ÕÏ°­£º%d"),  item_size);
+    outtextxy(win_width + 20, 80, text);
+    if(item_size == 0){
+        win = true;
+    }
 
     bubbleManager.Show();
     bubbleManager.Bomb(game_map, roles, bomb_callback);

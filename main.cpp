@@ -1,21 +1,29 @@
 #define _CRT_SECURE_NO_WARNINGS
-
 #include <iostream>
 #include <graphics.h>
 #include "game.h"
 
 using namespace std;
 
-int main() {
-    srand(timeGetTime());  //ç”¨ç³»ç»Ÿæ—¶é—´åˆå§‹åŒ–éšæœºç§å­
-
-    initgraph(win_width, win_height);
-
-    //loadimage(0, "res/title.png", 0, 0, true);
+void strat(){
     loadimage(0, "res/title.png");
     mciSendString("play res/bg.mp3 repeat", 0, 0, 0);
-    //system("pause");
+    while (1){
+        if (GetAsyncKeyState(VK_SPACE) & 0x8000){
+            break;
+        }
+        Sleep(1000);
+    }
     mciSendString("stop res/bg.mp3", 0, 0, 0);
+}
+
+int main() {
+    //SetConsoleOutputCP(65001);
+    srand(timeGetTime());  //ÓÃÏµÍ³Ê±¼ä³õÊ¼»¯Ëæ»úÖÖ×Ó
+
+    initgraph(win_width + 120, win_height);
+
+    //loadimage(0, "res/title.png", 0, 0, true);
 
     int map_type = 2;
     Game *game = new Game(map_type);
@@ -29,8 +37,11 @@ int main() {
         mciSendString("stop res/bg.mp3", 0, 0, 0);
 
         delete game;
+
+        strat();
+
         game = new Game(map_type);
-        // ä½¿ç”¨å±€éƒ¨å˜é‡æœ‰bugï¼Œå‡ ä¸ªç±»ç”¨åˆ°*Gameï¼Œgame = Game()è®¾è®¡åˆ°ï¼›ä¸¤ä¸ªGameï¼Œä¸€ä¸ªä¸´æ—¶çš„ä¸€ä¸ªèµ‹å€¼è¯­å¥
+        // Ê¹ÓÃ¾Ö²¿±äÁ¿ÓĞbug£¬¼¸¸öÀàÓÃµ½*Game£¬game = Game()Éè¼Æµ½£»Á½¸öGame£¬Ò»¸öÁÙÊ±µÄÒ»¸ö¸³ÖµÓï¾ä
         //game = Game();
     }
 

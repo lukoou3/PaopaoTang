@@ -60,7 +60,7 @@ vector<vector<int>>  game_map = {
 int main() {
     initgraph(win_width, win_height);
 
-    // åˆ†éš”åŠ è½½å›¾ç‰‡
+    // ·Ö¸ô¼ÓÔØÍ¼Æ¬
     IMAGE img;
     loadimage(&img, "res/road.png");
     SetWorkingImage(&img);
@@ -151,7 +151,7 @@ int main() {
 
 
 
-    // åŠ è½½å›¾ç‰‡
+    // ¼ÓÔØÍ¼Æ¬
     loadimage(&block_red_img, "res/TownBlockRed.bmp", item_width, item_height, true);
     loadimage(&block_yellow_img, "res/TownBlockYellow.bmp", item_width, item_height, true);
     loadimage(&house_blue_img, "res/TownHouseBlue.png", item_width, item_height + 16, true);

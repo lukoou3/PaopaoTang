@@ -142,8 +142,22 @@ void Role::Show() {
     if(!exploded){
         putimagePNG2(x, y, Img());
     }
+    ShowInfo();
 }
 
+void Role::ShowInfo() {
+    TCHAR text[62];
+    settextstyle(16, 0,  _T("ËÎÌå"));
+    setcolor(WHITE);
+    _stprintf(text,  _T("ÅÝÅÝ£º%d"), bubbleMax);
+    outtextxy(win_width + 20, 100, text);
+    _stprintf(text,  _T("¾àÀë£º%d"), attack_distance);
+    outtextxy(win_width + 20, 120, text);
+    _stprintf(text,  _T("´©Í¸£º%d"), prick_count);
+    outtextxy(win_width + 20, 140, text);
+    _stprintf(text ,  _T("ÊØÎÀ£º%d"), guard_count);
+    outtextxy(win_width + 20, 160, text);
+}
 
 void BubbleManager::AddBubble(int x, int y, Role *role) {
     bubbles.push_back(Bubble{x, y, role->Row(), role->Col(), role->attack_distance, role->AddBubble(), 40, 0, 0, role});
@@ -285,14 +299,14 @@ void BubbleManager::Bomb(vector<vector<int>> &game_map, vector<Role*> &roles, vo
             int i = row;
             while (i >= row_min && game_map[i][col] >= ROAD && game_map[i][col] < HOUSE1){
                 ExplodeRole(i, col, roles);
-                // ä¿®æ”¹æˆåªèƒ½ç ´ä¸€ä¸ªå¢™
+                // ÐÞ¸Ä³ÉÖ»ÄÜÆÆÒ»¸öÇ½
                 if(game_map[i][col] != ROAD){
-                    // æœ€åŽå†æ‰“ç ´ï¼Œå¦åˆ™ä¸‹æ¬¡åˆ·æ–°ç”»é¢ä¼šæ‰“ç ´éš”å£çš„
+                    // ×îºóÔÙ´òÆÆ£¬·ñÔòÏÂ´ÎË¢ÐÂ»­Ãæ»á´òÆÆ¸ô±ÚµÄ
                     if(bomb_bubble_die(b)){
                         game_map[i][col] = ROAD;
-                        fp(game, i, col); // å›žè°ƒå‡½æ•°
+                        fp(game, i, col); // »Øµ÷º¯Êý
                     }
-                    // prickå¯ä»¥è¿žç»­æ‰“æ–­
+                    // prick¿ÉÒÔÁ¬Ðø´ò¶Ï
                     if(!prick){
                         i --;
                         break;
@@ -304,11 +318,11 @@ void BubbleManager::Bomb(vector<vector<int>> &game_map, vector<Role*> &roles, vo
             i = row;
             while (i < row_max && game_map[i][col] >= ROAD && game_map[i][col] < HOUSE1){
                 ExplodeRole(i, col, roles);
-                // ä¿®æ”¹æˆåªèƒ½ç ´ä¸€ä¸ªå¢™
+                // ÐÞ¸Ä³ÉÖ»ÄÜÆÆÒ»¸öÇ½
                 if(game_map[i][col] != ROAD){
                     if(bomb_bubble_die(b)) {
                         game_map[i][col] = ROAD;
-                        fp(game, i, col); // å›žè°ƒå‡½æ•°
+                        fp(game, i, col); // »Øµ÷º¯Êý
                     }
                     if(!prick){
                         i ++;
@@ -324,7 +338,7 @@ void BubbleManager::Bomb(vector<vector<int>> &game_map, vector<Role*> &roles, vo
                 if(game_map[row][i] != ROAD){
                     if(bomb_bubble_die(b)) {
                         game_map[row][i] = ROAD;
-                        fp(game, row, i); // å›žè°ƒå‡½æ•°
+                        fp(game, row, i); // »Øµ÷º¯Êý
                     }
                     if(!prick){
                         i --;
@@ -340,7 +354,7 @@ void BubbleManager::Bomb(vector<vector<int>> &game_map, vector<Role*> &roles, vo
                 if(game_map[row][i] != ROAD){
                     if(bomb_bubble_die(b)) {
                         game_map[row][i] = ROAD;
-                        fp(game, row, i); // å›žè°ƒå‡½æ•°
+                        fp(game, row, i); // »Øµ÷º¯Êý
                     }
                     if(!prick){
                         i ++;

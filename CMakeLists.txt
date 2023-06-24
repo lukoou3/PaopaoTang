@@ -3,11 +3,11 @@ project(PaopaoTang)
 
 set(CMAKE_CXX_STANDARD 14)
 
-set(EasyX_DIR D:/apps/easyx4mingw) # æŒ‡å®šä¸‹è½½çš„easyx4mingwä½ç½®
+set(EasyX_DIR D:/apps/easyx4mingw) # Ö¸¶¨ÏÂÔØµÄeasyx4mingwÎ»ÖÃ
 include_directories(${EasyX_DIR}/include)
-link_directories(${EasyX_DIR}/lib64) # å¦‚æœæ˜¯32ä½ç³»ç»Ÿï¼Œåˆ™ä½¿ç”¨lib32
+link_directories(${EasyX_DIR}/lib64) # Èç¹ûÊÇ32Î»ÏµÍ³£¬ÔòÊ¹ÓÃlib32
 
-link_libraries(libEasyX.a libgdi32.a libole32.a) # é“¾æ¥EasyXåº“
+link_libraries(libEasyX.a libgdi32.a libole32.a) # Á´½ÓEasyX¿â
 
 add_executable(PaopaoTang main.cpp tools.cpp game.cpp items.cpp virtual_items.cpp)
 add_executable(test test.cpp tools.cpp)

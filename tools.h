@@ -1,18 +1,18 @@
 #pragma once
 #include <graphics.h>
 
-//è¿”å›è·ç¦»ä¸Šä¸€æ¬¡è°ƒç”¨é—´éš”çš„æ—¶é—´ï¼ˆå•ä½ï¼šms)ï¼Œç¬¬ä¸€æ¬¡è°ƒç”¨æ—¶è¿”å›0
+//·µ»Ø¾àÀëÉÏÒ»´Îµ÷ÓÃ¼ä¸ôµÄÊ±¼ä£¨µ¥Î»£ºms)£¬µÚÒ»´Îµ÷ÓÃÊ±·µ»Ø0
 int getDelay();
 
 void putimagePNG(int  picture_x, int picture_y, IMAGE* picture);
 
 void putimagePNGXY(int x, int y, int winWidth, int winHeight, IMAGE* picture);
 void putimagePNGY(int x, int y, int winHeight, IMAGE* picture);
-// é€‚ç”¨äº y <0 ä»¥åŠy>0çš„ä»»ä½•æƒ…å†µ
+// ÊÊÓÃÓÚ y <0 ÒÔ¼°y>0µÄÈÎºÎÇé¿ö
 void putimagePNG2(int x, int y, IMAGE* picture);
 void putimagePNG2(int x, int y, int winWidth, IMAGE* picture);
 
-// åˆ¤æ–­ä¸¤ä¸ªçŸ©å½¢æ˜¯å¦ç›¸äº¤
+// ÅĞ¶ÏÁ½¸ö¾ØĞÎÊÇ·ñÏà½»
 bool rectIntersect(int a1X, int a1Y, int a2X, int a2Y,
                    int b1X, int b1Y, int b2X, int b2Y);
 

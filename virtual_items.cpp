@@ -51,7 +51,7 @@ void RunItem::Show(int winWidth, int winHeight) {
 }
 
 void RunItem::Effect(Role *role) {
-    if(role->speed < item_width / 6) {
+    if(role->speed < item_width / 5) {
         role->speed += item_width / 20;
     }
 }
@@ -81,7 +81,7 @@ void GuardItem::Show(int winWidth, int winHeight) {
 }
 
 void GuardItem::Effect(Role *role) {
-    role->guard_count+=2;
+    role->guard_count+=1;
 }
 
 VirItemManager::VirItemManager(Game *game, int win_width, int win_height){

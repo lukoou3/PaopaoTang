@@ -83,6 +83,8 @@ public:
 
     void Show();
 
+    void ShowInfo();
+
     IMAGE *Img();
 };
 
@@ -106,7 +108,7 @@ struct BombBubble {
     int col;
     int attack_distance;
     int type;
-    int n; // ç¬¬å‡ æ¬¡æ˜¾ç¤º
+    int n; // µÚ¼¸´ÎÏÔÊ¾
     Role *role;
 };
 
@@ -115,7 +117,7 @@ struct ExplodeBubble {
     int y;
     int row;
     int col;
-    int n; // ç¬¬å‡ æ¬¡æ˜¾ç¤º
+    int n; // µÚ¼¸´ÎÏÔÊ¾
     int died;
     Role *role;
 };
