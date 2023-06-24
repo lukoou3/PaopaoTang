@@ -187,9 +187,9 @@ void BubbleManager::ExplodeShow() {
             int i = (b.n -1) / 12;
             if(i % 2 == 0){
                 IMAGE *ride_imgs1 = b.role->ride_imgs1;
-                putimagePNG(b.col * item_width - (ride_imgs1[1].getwidth()- item_width) / 2,
+                putimagePNGXY(b.col * item_width - (ride_imgs1[1].getwidth()- item_width) / 2,
                             b.row * item_height  - (ride_imgs1[1].getheight()- item_height) / 2,
-                            &ride_imgs1[1]);
+                            game->winWidth(), game->winHeight(), &ride_imgs1[1]);
             }
             PutBombImg(b.x,  b.y, i % 2 == 0?&explodeImgs[1]:&explodeImgs[1]);
             if(b.n > 120){
@@ -202,19 +202,19 @@ void BubbleManager::ExplodeShow() {
             b.n++;
             int i = (b.n -1) / 12;
             if(i == 0){
-                putimagePNG(b.x,  b.y, &explodeImgs[2]);
+                putimagePNGXY(b.x,  b.y, game->winWidth(), game->winHeight(),&explodeImgs[2]);
             }
             if(i == 1){
-                putimagePNG(b.x,  b.y, &explodeImgs[4]);
+                putimagePNGXY(b.x,  b.y, game->winWidth(), game->winHeight(), &explodeImgs[4]);
             }
             if(i == 2){
-                putimagePNG(b.x,  b.y, &explodeImgs[5]);
+                putimagePNGXY(b.x,  b.y, game->winWidth(), game->winHeight(), &explodeImgs[5]);
             }
             if(i == 3){
-                putimagePNG(b.x,  b.y, &explodeImgs[6]);
+                putimagePNGXY(b.x,  b.y, game->winWidth(), game->winHeight(), &explodeImgs[6]);
             }
             if(i < 11){
-                putimagePNG(b.x , b.y - 40, &b.role->die_imgs1[i]);
+                putimagePNGXY(b.x , b.y - 40, game->winWidth(), game->winHeight(), &b.role->die_imgs1[i]);
             }else{
                 b.died = 2;
                 game -> stop();

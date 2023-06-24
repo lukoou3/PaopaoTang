@@ -17,7 +17,8 @@ int main() {
     //system("pause");
     mciSendString("stop res/bg.mp3", 0, 0, 0);
 
-    Game *game = new Game();
+    int map_type = 2;
+    Game *game = new Game(map_type);
     while (1) {
         game->run();
 
@@ -28,7 +29,7 @@ int main() {
         mciSendString("stop res/bg.mp3", 0, 0, 0);
 
         delete game;
-        game = new Game();
+        game = new Game(map_type);
         // 使用局部变量有bug，几个类用到*Game，game = Game()设计到；两个Game，一个临时的一个赋值语句
         //game = Game();
     }

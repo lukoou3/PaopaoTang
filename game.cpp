@@ -1,6 +1,47 @@
 #include "game.h"
 #include <iostream>
 
+Game::Game(int map_type){
+    this->map_type = map_type;
+    init_map();
+}
+
+void Game::init_map(){
+    if(map_type == 1){
+        game_map = {
+                {0, HOUSE1, BLOCK1, HOUSE1, BLOCK1, TREE, 0, TREE, 0, TREE, BLOCK1, HOUSE2, BLOCK1, HOUSE2, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, BLOCK1, BLOCK2, BLOCK1, BLOCK2, 0, 0},
+                {0, HOUSE1, BLOCK1, HOUSE1, BLOCK1, TREE, BOX, TREE, 0, TREE, BLOCK1, HOUSE2, BLOCK1, HOUSE2, 0},
+                {0, BLOCK1, BLOCK2, BLOCK1, TREE, BOX, BOX, BLOCK1, 0, BOX, TREE, BLOCK1, BLOCK2, BLOCK1, BLOCK2},
+                {0, TREE, BLOCK1, TREE, BOX, BOX, TREE, 0, 0, 0, 0, TREE, BLOCK1, TREE, BLOCK1},
+                {0, 0, BOX, 0, 0, TREE, BLOCK1, 0, 0, TREE, 0, 0, BOX, 0, BLOCK2},
+                {0, TREE, BLOCK1, TREE, 0, BLOCK2, WINDMILL_VIR, WINDMILL, WINDMILL_VIR, BLOCK2, 0, TREE, BLOCK1, TREE, BLOCK2},
+                {0, 0, 0, 0, 0, TREE, BLOCK1, BLOCK1, BLOCK1, TREE, 0, 0, BOX, 0, BLOCK2},
+                {BLOCK1, TREE, BLOCK1, TREE, BOX, BOX, TREE, BLOCK2, TREE, 0, 0, TREE, BLOCK1, TREE, BLOCK1},
+                {BLOCK2, BLOCK1, BLOCK2, BLOCK1, TREE, BOX, BOX, BLOCK1, 0, 0, TREE, BLOCK1, BLOCK2, BLOCK1, BLOCK2},
+                {0, HOUSE2, BLOCK1, HOUSE2, BLOCK1, TREE, BOX, TREE, 0, TREE, BLOCK1, HOUSE3, BLOCK1, HOUSE3, 0},
+                {0, 0, BLOCK2, BLOCK1, BLOCK2, BLOCK1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, HOUSE2, BLOCK1, HOUSE2, BLOCK1, TREE, 0, TREE, 0, TREE, BLOCK1, HOUSE3, BLOCK1, HOUSE3, 0},
+        };
+    }else{
+        game_map = {
+                {0, BLOCK2, BLOCK1, BLOCK2, BLOCK1, BUSH, 0, 0, BOX, BUSH, HOUSE3, BLOCK1, HOUSE3, 0, HOUSE3},
+                {0, HOUSE1, BOX, HOUSE1, BOX, TREE, BOX, 0, 0,TREE, BLOCK1, BLOCK2, 0, 0, 0},
+                {0, 0, BLOCK2, BLOCK1, BLOCK2, BUSH, 0, BOX, BOX, BUSH, HOUSE3, BOX, HOUSE3, BOX, HOUSE3},
+                {BOX, HOUSE1, BOX, HOUSE1, BOX, TREE, BOX, 0, 0, TREE, BLOCK2, BLOCK1, BLOCK2, BLOCK1, BLOCK2},
+                {BLOCK1, BLOCK2, BLOCK1, BLOCK2, BLOCK1, BUSH, 0, 0, BOX, BUSH, HOUSE3, BOX, HOUSE3, BOX, HOUSE3},
+                {BLOCK2, HOUSE1, BLOCK2, HOUSE1, BLOCK2, TREE, BOX, BOX, 0, 0, BLOCK1, BLOCK2, BLOCK1, BLOCK2, BLOCK1},
+                {TREE, BUSH, TREE, BUSH, TREE, BUSH, 0, 0, BOX, BUSH, TREE, BUSH, TREE, BUSH, TREE},
+                {BLOCK1, BLOCK2, BLOCK1, BLOCK2, BLOCK1, 0, BOX, 0, 0, TREE, BLOCK1, HOUSE1, BLOCK1, HOUSE1, BLOCK1},
+                {HOUSE2, BOX, HOUSE2, BOX, HOUSE2, BUSH, 0, BOX, BOX, BUSH, BLOCK2, BLOCK1, BLOCK2, BLOCK1, BLOCK2},
+                {BLOCK2, BLOCK1, BLOCK2, BLOCK1, BLOCK2, TREE, BOX, 0, 0, TREE, BOX, HOUSE1, BOX, HOUSE1, BOX},
+                {HOUSE2, 0, HOUSE2, BOX, HOUSE2, BUSH, 0, 0, BOX, BUSH, BLOCK1, BLOCK2, BLOCK1, BLOCK2, 0},
+                {0, 0, BLOCK1, BLOCK2, BLOCK1, TREE, BOX, BOX, 0, TREE, BOX, HOUSE1, BOX, HOUSE1, 0},
+                {HOUSE2, 0, HOUSE2, BLOCK1,HOUSE2, BUSH, 0, 0, BOX, BUSH, BLOCK2, BLOCK1, BLOCK2, 0, 0},
+        };
+    }
+}
+
 void Game::run(){
     cout << "game_run, game address:" << this << endl;
 
@@ -21,6 +62,7 @@ void Game::run(){
 
 void Game::init(){
     //preLoadSound("res/snd/start.mp3");
+    //preLoadSound("res/snd/appear.mp3");
     //preLoadSound("res/snd/explode.mp3");
     //preLoadSound("res/snd/get.mp3");
     //preLoadSound("res/snd/die.mp3");
@@ -41,6 +83,13 @@ void Game::init(){
     getimage(&middle_road_img1, 40 * 6, 0, 40, 40);
     getimage(&middle_road_img2, 40 * 7, 0, 40, 40);
     getimage(&middle_road_img3, 40 * 8, 0, 40, 40);
+    /*loadimage(&img, "res/MapType1.png", 50  * 16, 50, true);
+    SetWorkingImage(&img);
+    getimage(&grey_road_img, 5 + 50 * 4, 5, 40, 40);
+    getimage(&green_road_img, 5 + 50 * 1, 5, 40, 40);
+    getimage(&middle_road_img1, 5 + 50 * 2, 5, 40, 40);
+    getimage(&middle_road_img2, 5 + 50 * 5, 5, 40, 40);
+    getimage(&middle_road_img3, 5 + 50 * 2, 5, 40, 40);*/
     loadimage(&img, "res/TownWindmillAni.png");
     SetWorkingImage(&img);
     getimage(&windmill_ani_img1, 0, 0, 120, 118);
@@ -146,10 +195,16 @@ void Game::init(){
     loadimage(&house_red_img, "res/TownHouseRed.png", item_width, item_height + 16, true);
     loadimage(&house_yellow_img, "res/TownHouseYellow.png", item_width, item_height + 16, true);
     loadimage(&box_img, "res/TownBox.bmp", item_width, item_height, true);
+    loadimage(&bush_img, "res/TownBush.png", item_width, item_height + 12, true);
     loadimage(&tree_img, "res/TownTree.png");
     loadimage(&windmill_img, "res/TownWindmill.png", item_width * 3, 62, true);
 
-    role.Init(this, role_imgs1, 4 * item_width, 7 * item_height - (64 - 40), win_width, win_height);
+    if(map_type == 1){
+        role.Init(this, role_imgs1, 0 * item_width, 0 * item_height - (64 - 40), win_width, win_height);
+    }else{
+        role.Init(this, role_imgs1, 0 * item_width, 0 * item_height - (64 - 40), win_width, win_height);
+    }
+
     roles.push_back(&role);
     for (int i = 0; i < 4; ++i) {
         role.ride_imgs1[i] = role_ride_imgs1[i];
@@ -177,6 +232,7 @@ void Game::control(){
         }
         if (GetAsyncKeyState(VK_SPACE) & 0x8000){
             if(role.Bubble()){
+                mciSendString("play res/snd/appear.mp3", 0, 0, 0);
                 bubbleManager.AddBubble(role.X() + role.Img()->getwidth()/2 - 22 , role.Y() + role.Img()->getheight() /2 - 16, &role);
             }
         }
@@ -242,7 +298,11 @@ void Game::show(){
     }
 
     for (int i = 0; i < row; i++) {
-        putimagePNG(item_width * 0, item_height * i, &grey_road_img);
+        if(map_type == 1){
+            putimagePNG(item_width * 0, item_height * i, &grey_road_img);
+        }else{
+            putimagePNG(item_width * 0, item_height * i, &green_road_img);
+        }
         int j;
         for (j = 1; j < 6; ++j) {
             putimagePNG(item_width * j, item_height * i, &green_road_img);
@@ -253,7 +313,11 @@ void Game::show(){
         for (; j < col - 1; ++j) {
             putimagePNG(item_width * j, item_height * i, &green_road_img);
         }
-        putimagePNG(item_width * j, item_height * i, &grey_road_img);
+        if(map_type == 1){
+            putimagePNG(item_width * j, item_height * i, &grey_road_img);
+        }else{
+            putimagePNG(item_width * j, item_height * i, &green_road_img);
+        }
     }
 
     int windmill_x = 0, windmill_y= 0;
@@ -280,6 +344,9 @@ void Game::show(){
                     break;
                 case HOUSE3:
                     putimagePNG2(x, y - 16, &house_yellow_img);
+                    break;
+                case BUSH:
+                    putimagePNG2(x, y - 14, &bush_img);
                     break;
                 case TREE:
                     putimagePNGY(x, y - (tree_img.getheight() - item_height - 6), win_height, &tree_img);
@@ -309,7 +376,9 @@ void Game::show(){
 
     bubbleManager.ExplodeShow();
 
-    putimagePNG(windmill_x - item_width, windmill_y - 3 * item_height + 2, n % 24 <= 11? &windmill_ani_img1: &windmill_ani_img2);
+    if(windmill_x > 0){
+        putimagePNG(windmill_x - item_width, windmill_y - 3 * item_height + 2, n % 24 <= 11? &windmill_ani_img1: &windmill_ani_img2);
+    }
 
     FlushBatchDraw();
     //EndBatchDraw();
