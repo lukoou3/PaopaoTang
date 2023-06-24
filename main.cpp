@@ -12,7 +12,7 @@ void strat(){
         if (GetAsyncKeyState(VK_SPACE) & 0x8000){
             break;
         }
-        Sleep(1000);
+        Sleep(50);
     }
     mciSendString("stop res/bg.mp3", 0, 0, 0);
 }

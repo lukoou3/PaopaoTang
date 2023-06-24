@@ -9,6 +9,8 @@ link_directories(${EasyX_DIR}/lib64) # 如果是32位系统，则使用lib32
 
 link_libraries(libEasyX.a libgdi32.a libole32.a) # 链接EasyX库
 
+#使生成的exe直接能点击运行，文件会变大
+#set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
 add_executable(PaopaoTang main.cpp tools.cpp game.cpp items.cpp virtual_items.cpp)
 add_executable(test test.cpp tools.cpp)
 
